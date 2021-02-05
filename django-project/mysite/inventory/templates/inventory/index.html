@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    table {width:100%;}
+    th, td {border:1px solid black;}
+    th p {font-size: 50%;}
+</style>
+</head>
+<body>
+    <h1>
+        Umi Product Inventory
+    </h1>
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Available Product<p>(inventory + PO's - Customer Orders )</p></th>
+            <th>Factory PO's</th>
+            <th>Customer Orders</th>
+            <th>Inventory</th>
+            <th>Par Stock</th>
+            <th>Stock Error</th>
+        </tr>
+        {% for product, available, purchase_orders, customer_orders in product_inventories %}
+        <tr>
+            <td>{{ product.name }}</a></td>
+            <td>{{ available }} </td>
+            <td><a href="{% url 'product_purchase_orders' product.label %}">{{ purchase_orders }}</a></td>
+            <td><a href="{% url 'product_customer_orders' product.label %}">{{ customer_orders }}</a></td>
+            <td>{{product.back_stock}}</td>
+            <td>{{product.par_stock}}</td>
+            <td>{{product.stock_error}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    table {width:100%;}
+    th, td {border:1px solid black;}
+    th p {font-size: 50%;}
+</style>
+</head>
+<body>
+    <h1>
+        Purchase Orders related to {{ product.name }}
+    </h1>
+    <table>
+        <tr>
+            <th>Order Number</th>
+            <th>Date</th>
+            <th>Runs</th>
+            <th>Run Quantity</th>
+            <th>Total</th>
+        </tr>
+        {% for related_purchase_order in object_list %}
+        <tr>
+            <td>{{ related_purchase_order.order_number }}</td>
+            <td>{{ related_purchase_order.date }}</td>
+            <td>{{ related_purchase_order.runs }}</td>
+            <td>{{ related_purchase_order.run_quantity }}</td>
+            <td>{{ related_purchase_order.total }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <hr>
+    <a href="{% url 'index' %}">back to all inventory</a>
+</body>
+</html>
