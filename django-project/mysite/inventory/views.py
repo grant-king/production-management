@@ -82,4 +82,16 @@ class CustomerCustomerOrderList(ListView):
 class PurchaseOrderDetail(DetailView):
     model = PurchaseOrder
     template_name = 'inventory/purchase_order_detail.html'
-    
+
+
+class PurchaseOrderList(ListView):
+    model = PurchaseOrder
+    template_name = 'inventory/purchase_orders.html'
+
+    def get_context_data(self, **kwargs):
+        po_count = PurchaseOrder.objects.count()
+        context = super().get_context_data(**kwargs)
+        context['po_count'] = po_count
+        return context
+
+
