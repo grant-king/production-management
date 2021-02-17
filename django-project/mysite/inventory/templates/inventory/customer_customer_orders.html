@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    table {width:100%;}
+    th, td {border:1px solid black;}
+    th p {font-size: 50%;}
+</style>
+</head>
+<body>
+    <h1>
+        {{ customer.name }} Customer Orders
+    </h1>
+    <table>
+        <tr>
+            <th>Order Number</th>
+            <th>Product</th>
+            <th>Date</th>
+            <th>Quantity</th>
+        </tr>
+        {% for related_customer_order in object_list %}
+        <tr>
+            <td>{{ related_customer_order.order_number }}</td>
+            <td>{{ related_customer_order.product.name }}</td>
+            <td>{{ related_customer_order.date }}</td>
+            <td>{{ related_customer_order.quantity }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <hr>
+    <a href="{% url 'index' %}">back to all inventory</a>
+</body>
+</html>
