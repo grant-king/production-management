@@ -21,7 +21,7 @@
         {% for related_customer_order in object_list %}
         <tr>
             <td>{{ related_customer_order.order_number }}</td>
-            <td>{{ related_customer_order.customer.name }}</td>
+            <td><a href="{% url 'customer_customer_orders' related_customer_order.customer.label %}">{{ related_customer_order.customer.name }}</a></td>
             <td>{{ related_customer_order.date }}</td>
             <td>{{ related_customer_order.quantity }}</td>
         </tr>
