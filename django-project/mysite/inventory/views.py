@@ -77,3 +77,9 @@ class CustomerCustomerOrderList(ListView):
         context['customer'] = self.customer
 
         return context
+
+
+class PurchaseOrderDetail(DetailView):
+    model = PurchaseOrder
+    template_name = 'inventory/purchase_order_detail.html'
+    

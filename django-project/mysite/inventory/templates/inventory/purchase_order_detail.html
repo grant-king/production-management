@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    table {width:100%;}
+    th, td {border:1px solid black;}
+    th p {font-size: 50%;}
+</style>
+</head>
+<body>
+    <h1>
+        Purchase Order {{object.order_number}} Detail
+    </h1>
+    <table>
+        <tr>
+            <th>Order Number</th>
+            <th>Date</th>
+            <th>Runs</th>
+            <th>Run Quantity</th>
+            <th>Total</th>
+        </tr>
+        
+        <tr>
+            <td>{{ object.order_number }}</td>
+            <td>{{ object.date }}</td>
+            <td>{{ object.runs }}</td>
+            <td>{{ object.run_quantity }}</td>
+            <td>{{ object.total }}</td>
+        </tr>
+        
+    </table>
+    <br>
+    <hr>
+    <a href="{% url 'index' %}">back to all inventory</a>
+</body>
+</html>
+
