@@ -23,11 +23,11 @@
         </tr>
         {% for product, available, purchase_orders, customer_orders in product_inventories %}
         <tr>
-            <td>{{ product.name }}</a></td>
-            <td>{{ available }} </td>
+            <td><a href="{% url 'product_detail' product.label %}">{{ product.name }}</a></td>
+            <td>{{ available }}</a></td>
             <td><a href="{% url 'product_purchase_orders' product.label %}">{{ purchase_orders }}</a></td>
             <td><a href="{% url 'product_customer_orders' product.label %}">{{ customer_orders }}</a></td>
-            <td>{{product.back_stock}}</td>
+            <td>{{product.inventory}}</td>
             <td>{{product.par_stock}}</td>
             <td>{{product.stock_error}}</td>
         </tr>
