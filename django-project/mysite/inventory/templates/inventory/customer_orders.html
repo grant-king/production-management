@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    table {width:100%;}
+    th, td {border:1px solid black;}
+    th p {font-size: 50%;}
+</style>
+</head>
+<body>
+    <h1>
+        All {{ co_count }} Customer Orders
+    </h1>
+    <table>
+        <tr>
+            <th>Order Number</th>
+            <th>Product</th>
+            <th>Date</th>
+            <th>Quantity</th>
+            <th>Customer</th>
+        </tr>
+        {% for customer_order in object_list %}
+        <tr>
+            <td><a href="{% url 'customer_order_detail' customer_order.pk %}">{{ customer_order.order_number }}</a></td>
+            <td><a href="{% url 'product_detail' customer_order.product.label %}">{{ customer_order.product.name }}</a></td>
+            <td>{{ customer_order.date }}</td>
+            <td>{{ customer_order.quantity }}</td>
+            <td><a href="{% url 'customer_customer_orders' customer_order.customer.label %}">{{ customer_order.customer.name }}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <hr>
+    <a href="{% url 'index' %}">back to all inventory</a>
+</body>
+</html>

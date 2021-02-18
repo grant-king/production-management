@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    table {width:100%;}
+    th, td {border:1px solid black;}
+    th p {font-size: 50%;}
+</style>
+</head>
+<body>
+    <h1>
+        Customer Order {{ object.order_number }} Detail
+    </h1>
+    <table>
+        <tr>
+            <th>Order Number</th>
+            <th>Product</th>
+            <th>Date</th>
+            <th>Quantity</th>
+            <th>Customer</th>
+        </tr>
+        <tr>
+            <td>{{ object.order_number }}</td>
+            <td><a href="{% url 'product_detail' object.product.label %}">{{ object.product.name }}</a></td>
+            <td>{{ object.date }}</td>
+            <td>{{ object.quantity }}</td>
+            <td><a href="{% url 'customer_customer_orders' object.customer.label %}">{{ object.customer.name }}</a></td>
+        </tr>
+    </table>
+    <br>
+    <hr>
+    <a href="{% url 'index' %}">back to all inventory</a>
+</body>
+</html>
