@@ -14,6 +14,7 @@
     <table>
         <tr>
             <th>Order Number</th>
+            <th>Product</th>
             <th>Date</th>
             <th>Runs</th>
             <th>Run Quantity</th>
@@ -22,6 +23,7 @@
     {% for object in object_list %}        
         <tr>
             <td><a href="{% url 'purchase_order_detail' object.pk %}">{{ object.order_number }}</a></td>
+            <td><a href="{% url 'product_detail' object.product.label %}">{{ object.product.name }}</a></td>
             <td>{{ object.date }}</td>
             <td>{{ object.runs }}</td>
             <td>{{ object.run_quantity }}</td>
