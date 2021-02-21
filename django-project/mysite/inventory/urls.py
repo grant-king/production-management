@@ -1,10 +1,24 @@
-from django.urls import path
+from django.urls import path, register_converter
 from . import views
 from inventory.views import (
     ProductCustomerOrderList, ProductPurchaseOrderList, PurchaseOrderList,
     product_detail, CustomerCustomerOrderList, PurchaseOrderDetail, 
-    CustomerOrderDetail, CustomerOrderList
+    CustomerOrderDetail, CustomerOrderList, PurchaseOrderDateFilterList,
 )
+from datetime import datetime
+
+
+class DateConverter:
+    regex = '\d{4}-\d{2}-\d{2}'
+
+    def to_python(self, value):
+        return datetime.strptime(value, '%Y-%m-%d')
+
+    def to_url(self, value):
+        return value
+
+
+register_converter(DateConverter, 'yyyy')
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -16,4 +30,5 @@ urlpatterns = [
     path('purchase_orders/all/', PurchaseOrderList.as_view(), name='all_purchase_orders'),
     path('customers/<customer>/', CustomerCustomerOrderList.as_view(), name='customer_customer_orders'),
     path('products/<product>/', views.product_detail, name='product_detail'),
+    path('purchase_orders/date/<yyyy:date>/', PurchaseOrderDateFilterList.as_view(), name='date_filter_purchase_orders'),
 ]

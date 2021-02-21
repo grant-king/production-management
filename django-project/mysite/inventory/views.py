@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import DetailView, ListView
 from .models import CustomerOrder, PurchaseOrder, Product, Customer
+from datetime import datetime
 
 def index(request):
     product_list = Product.objects.all()
@@ -94,6 +95,24 @@ class PurchaseOrderList(ListView):
         context = super().get_context_data(**kwargs)
         context['po_count'] = po_count
         return context
+
+class PurchaseOrderDateFilterList(ListView):
+    model = PurchaseOrder
+    template_name = 'inventory/purchase_orders.html'
+    ordering = ['date']
+
+    def get_context_data(self, **kwargs):
+        po_count = self.get_queryset().count()
+        context = super().get_context_data(**kwargs)
+        context['po_filter_count'] = po_count
+        context['filter_date'] = self.kwargs['date'].date()
+        return context
+
+    def get_queryset(self):
+        start_date = self.kwargs['date']
+        end_date = datetime.now()
+        return PurchaseOrder.objects.filter(date__range=[start_date, end_date])
+        
 
 
 class CustomerOrderDetail(DetailView):
