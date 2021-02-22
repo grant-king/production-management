@@ -4,7 +4,8 @@ from inventory.views import (
     ProductCustomerOrderList, ProductPurchaseOrderList, PurchaseOrderList,
     product_detail, CustomerCustomerOrderList, PurchaseOrderDetail, 
     CustomerOrderDetail, CustomerOrderList, PurchaseOrderDateFilterList,
-    CustomerOrderDateFilterList, ProductCustomerOrderDateFilterList,
+    CustomerOrderDateFilterList, ProductCustomerOrderDateFilterList, 
+    ProductOrders, ProductOrdersDateFilter,
 )
 from datetime import datetime
 
@@ -32,6 +33,8 @@ urlpatterns = [
     path('purchase_orders/all/', PurchaseOrderList.as_view(), name='all_purchase_orders'),
     path('customers/<customer>/', CustomerCustomerOrderList.as_view(), name='customer_customer_orders'),
     path('products/<product>/', views.product_detail, name='product_detail'),
+    path('productorders/<slug:product>/', ProductOrders.as_view(), name='product_orders'),
+    path('productorders/<slug:product>/<yyyy:date>/', ProductOrdersDateFilter.as_view(), name='date_filter_product_orders'),
     path('purchase_orders/date/<yyyy:date>/', PurchaseOrderDateFilterList.as_view(), name='date_filter_purchase_orders'),
     path('customer_orders/date/<yyyy:date>/', CustomerOrderDateFilterList.as_view(), name='date_filter_customer_orders'),
 ]

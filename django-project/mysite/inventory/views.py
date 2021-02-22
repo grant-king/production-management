@@ -38,6 +38,62 @@ def product_detail(request, product):
     return render(request, 'inventory/product_detail.html', context)
 
 
+class ProductOrders(DetailView):
+    template_name = 'inventory/product_order_detail.html'
+    model = Product
+    slug_field = 'label'
+    slug_url_kwarg = 'product'
+
+    def get_context_data(self, **kwargs):
+        self.product = self.get_object()
+        self.related_customer_orders = CustomerOrder.objects.filter(product=self.product)
+        self.related_purchase_orders = PurchaseOrder.objects.filter(product=self.product)
+        rco_sum = sum([customer_order.quantity for customer_order in self.related_customer_orders])
+        rpo_sum = sum([purchase_order.total for purchase_order in self.related_purchase_orders])
+        calculated_inventory = self.product.inventory + rpo_sum - rco_sum
+
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.product
+        context['available'] = calculated_inventory
+        context['customer_orders_total'] = rco_sum
+        context['purchase_orders_total'] = rpo_sum
+        context['related_customer_orders'] = self.related_customer_orders
+        context['related_purchase_orders'] = self.related_purchase_orders
+
+        return context
+
+
+class ProductOrdersDateFilter(DetailView):
+    template_name = 'inventory/product_order_detail.html'
+    model = Product
+    slug_field = 'label'
+    slug_url_kwarg = 'product'
+
+    def get_context_data(self, **kwargs):
+        start_date = self.kwargs['date']
+        end_date = datetime.now()
+        
+        self.product = self.get_object()
+        self.related_customer_orders = CustomerOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('date')
+        self.related_purchase_orders = PurchaseOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('date')
+        rco_sum = sum([customer_order.quantity for customer_order in self.related_customer_orders])
+        rpo_sum = sum([purchase_order.total for purchase_order in self.related_purchase_orders])
+        calculated_inventory = self.product.inventory + rpo_sum - rco_sum
+
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.product
+        context['available'] = calculated_inventory
+        context['customer_orders_total'] = rco_sum
+        context['purchase_orders_total'] = rpo_sum
+        context['related_customer_orders'] = self.related_customer_orders
+        context['related_purchase_orders'] = self.related_purchase_orders
+        context['co_filter_count'] = self.related_customer_orders.count()
+        context['po_filter_count'] = self.related_purchase_orders.count()
+        context['filter_date'] = self.kwargs['date'].date()
+
+        return context
+
+
 class ProductCustomerOrderList(ListView):
     template_name = 'inventory/product_customer_orders.html'
     
@@ -52,7 +108,6 @@ class ProductCustomerOrderList(ListView):
 
 
 class ProductCustomerOrderDateFilterList(ListView):
-    model = PurchaseOrder
     template_name = 'inventory/product_customer_orders.html'
     ordering = ['date']
 
