@@ -48,10 +48,29 @@ class ProductCustomerOrderList(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['product'] = self.product
-
         return context
 
 
+class ProductCustomerOrderDateFilterList(ListView):
+    model = PurchaseOrder
+    template_name = 'inventory/product_customer_orders.html'
+    ordering = ['date']
+
+    def get_queryset(self):
+        start_date = self.kwargs['date']
+        end_date = datetime.now()
+        self.product = Product.objects.get(label=self.kwargs['product'])
+        return CustomerOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('date')
+
+    def get_context_data(self, **kwargs):
+        co_count = self.get_queryset().count()
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.product
+        context['co_filter_count'] = co_count
+        context['filter_date'] = self.kwargs['date'].date()
+        return context
+
+    
 class ProductPurchaseOrderList(ListView):
     template_name = 'inventory/product_purchase_orders.html'
     

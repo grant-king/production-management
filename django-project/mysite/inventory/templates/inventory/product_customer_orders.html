@@ -9,7 +9,12 @@
 </head>
 <body>
     <h1>
+        {% if co_filter_count %}
+        {{ co_filter_count }} Customer Orders for {{ product.name }} from {{ filter_date }} to today
+        {% else %}
         Customer orders related to {{ product.name }}
+        {% endif %}
+        
     </h1>
     <table>
         <tr>
@@ -22,7 +27,7 @@
         <tr>
             <td>{{ related_customer_order.order_number }}</td>
             <td><a href="{% url 'customer_customer_orders' related_customer_order.customer.label %}">{{ related_customer_order.customer.name }}</a></td>
-            <td>{{ related_customer_order.date }}</td>
+            <td><a href="{% url 'date_filter_product_customer_orders' related_customer_order.product.label related_customer_order.date %}">{{ related_customer_order.date }}</a></td>
             <td>{{ related_customer_order.quantity }}</td>
         </tr>
         {% endfor %}
