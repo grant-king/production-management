@@ -70,8 +70,14 @@ class ProductOrdersDateFilter(DetailView):
     slug_url_kwarg = 'product'
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
         start_date = self.kwargs['date']
-        end_date = datetime.now()
+        try:
+            end_date = self.kwargs['end_date']
+        except:
+            end_date = max(max([item.date for item in CustomerOrder.objects.all()]), max([item.date for item in PurchaseOrder.objects.all()]))
+            context['end_date_unset'] = True
         
         self.product = self.get_object()
         self.related_customer_orders = CustomerOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('date')
@@ -79,8 +85,7 @@ class ProductOrdersDateFilter(DetailView):
         rco_sum = sum([customer_order.quantity for customer_order in self.related_customer_orders])
         rpo_sum = sum([purchase_order.total for purchase_order in self.related_purchase_orders])
         calculated_inventory = self.product.inventory + rpo_sum - rco_sum
-
-        context = super().get_context_data(**kwargs)
+        
         context['product'] = self.product
         context['available'] = calculated_inventory
         context['customer_orders_total'] = rco_sum
@@ -89,7 +94,11 @@ class ProductOrdersDateFilter(DetailView):
         context['related_purchase_orders'] = self.related_purchase_orders
         context['co_filter_count'] = self.related_customer_orders.count()
         context['po_filter_count'] = self.related_purchase_orders.count()
-        context['filter_date'] = self.kwargs['date'].date()
+        context['start_date'] = start_date.date()
+        try:
+            context['end_date'] = end_date.date()
+        except:
+            context['end_date'] = end_date
 
         return context
 

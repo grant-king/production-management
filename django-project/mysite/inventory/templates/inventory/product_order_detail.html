@@ -5,6 +5,7 @@
     table {width:100%;}
     th, td {border:1px solid black;}
     th p {font-size: 50%;}
+    td p {font-size: 75%;}
 </style>
 </head>
 <body>
@@ -13,7 +14,7 @@
     </h1>
     <table>
         <tr>
-            <th>Available Product</th>
+            <th>Available Product<p>(inventory + PO's - Customer Orders )</p></th>
             <th><a href="{% url 'product_purchase_orders' product.label %}">Purchase Order Total</a></th>
             <th><a href="{% url 'product_customer_orders' product.label %}">Customer Order Total</a></th>
             <th>Inventory</th>
@@ -23,7 +24,7 @@
         </tr>
         
         <tr>
-            <td>{{ available }}</td>
+            <td><p>{{ product.inventory}} + {{ purchase_orders_total }} - {{ customer_orders_total }} = </p>{{ available }}</td>
             <td>{{ purchase_orders_total }}</td>
             <td>{{ customer_orders_total }}</td>
             <td>{{ product.inventory }}</td>
@@ -33,14 +34,26 @@
     </table>
     <br>
     <hr>
-
-    <h2>
-        {% if po_filter_count %}
-        {{ po_filter_count }} Purchase Orders for {{ product.name }} from {{ filter_date }} to today
+    {% if start_date %}
+        <h2>Date range: {{ start_date }} to {{ end_date }}</h2>
+        {% if end_date_unset %}
+            <p>click another date to set the date filter endpoint</p>
+        {% else %}
+            <a href="{% url 'product_orders' product.label %}">back to all orders for {{ product.name }}</a>
+        {% endif %}
+    {% else %}
+        <h2>All related orders</h2>
+        <p>click a date to set the date filter starting point</p>
+    {% endif %}    
+        
+    <hr>
+    <h3>
+        {% if start_date %}
+        {{ po_filter_count }} Purchase Orders for {{ product.name }} for this date range
         {% else %}
         Purchase Orders related to {{ product.name }}
         {% endif %}
-    </h2>
+    </h3>
     <table>
         <tr>
             <th>Order Number</th>
@@ -52,7 +65,11 @@
         {% for related_purchase_order in related_purchase_orders %}
         <tr>
             <td><a href="{% url 'purchase_order_detail' related_purchase_order.pk %}">{{ related_purchase_order.order_number }}</a></td>
+            {% if end_date_unset %}
+            <td><a href="{% url 'date_range_filter_product_orders' related_purchase_order.product.label start_date|date:'Y-m-d' related_purchase_order.date %}">{{ related_purchase_order.date }}</a></td>
+            {% else %}
             <td><a href="{% url 'date_filter_product_orders' related_purchase_order.product.label related_purchase_order.date %}">{{ related_purchase_order.date }}</a></td>
+            {% endif %}
             <td>{{ related_purchase_order.runs }}</td>
             <td>{{ related_purchase_order.run_quantity }}</td>
             <td>{{ related_purchase_order.total }}</td>
@@ -62,14 +79,14 @@
     <br>
     <hr>
 
-    <h2>
-        {% if co_filter_count %}
-        {{ co_filter_count }} Customer Orders for {{ product.name }} from {{ filter_date }} to today
+    <h3>
+        {% if start_date %}
+        {{ co_filter_count }} Customer Orders for {{ product.name }} for this date range
         {% else %}
         Customer Orders related to {{ product.name }}
         {% endif %}
         
-    </h2>
+    </h3>
     <table>
         <tr>
             <th>Order Number</th>
@@ -81,14 +98,21 @@
         <tr>
             <td><a href="{% url 'customer_order_detail' related_customer_order.pk %}">{{ related_customer_order.order_number }}</a></td>
             <td><a href="{% url 'customer_customer_orders' related_customer_order.customer.label %}">{{ related_customer_order.customer.name }}</a></td>
+            {% if end_date_unset %}
+            <td><a href="{% url 'date_range_filter_product_orders' related_customer_order.product.label start_date|date:'Y-m-d' related_customer_order.date %}">{{ related_customer_order.date }}</a></td>
+            {% else %}
             <td><a href="{% url 'date_filter_product_orders' related_customer_order.product.label related_customer_order.date %}">{{ related_customer_order.date }}</a></td>
+            {% endif %}
             <td>{{ related_customer_order.quantity }}</td>
         </tr>
         {% endfor %}
     </table>
     <br>
     <hr>
-
+    {% if start_date %}
+    <a href="{% url 'product_orders' product.label %}">back to all orders for {{ product.name }}</a>
+    {% endif %}
+    <br>
     <a href="{% url 'index' %}">back to all inventory</a>
 </body>
 </html>
