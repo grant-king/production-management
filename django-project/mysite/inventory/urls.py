@@ -36,6 +36,8 @@ urlpatterns = [
     path('productorders/<slug:product>/', ProductOrders.as_view(), name='product_orders'),
     path('productorders/<slug:product>/<yyyy:date>/', ProductOrdersDateFilter.as_view(), name='date_filter_product_orders'),
     path('productorders/<slug:product>/<yyyy:date>/<yyyy:end_date>/', ProductOrdersDateFilter.as_view(), name='date_range_filter_product_orders'),
-    path('purchase_orders/date/<yyyy:date>/', PurchaseOrderDateFilterList.as_view(), name='date_filter_purchase_orders'),
-    path('customer_orders/date/<yyyy:date>/', CustomerOrderDateFilterList.as_view(), name='date_filter_customer_orders'),
+    path('purchase_orders/<yyyy:date>/', PurchaseOrderDateFilterList.as_view(), name='date_filter_purchase_orders'),
+    path('purchase_orders/<yyyy:date>/<yyyy:end_date>/', PurchaseOrderDateFilterList.as_view(), name='date_range_filter_purchase_orders'),
+    path('customer_orders/<yyyy:date>/', CustomerOrderDateFilterList.as_view(), name='date_filter_customer_orders'),
+    path('customer_orders/<yyyy:date>/<yyyy:end_date>/', CustomerOrderDateFilterList.as_view(), name='date_range_filter_customer_orders'),
 ]

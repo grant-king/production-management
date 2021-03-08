@@ -186,34 +186,54 @@ class PurchaseOrderDateFilterList(ListView):
     ordering = ['date']
 
     def get_context_data(self, **kwargs):
-        po_count = self.get_queryset().count()
         context = super().get_context_data(**kwargs)
+        po_count = self.get_queryset().count()
         context['po_filter_count'] = po_count
-        context['filter_date'] = self.kwargs['date'].date()
+        context['start_date'] = self.kwargs['date'].date()
+        try:
+            context['end_date'] = self.end_date.date()
+        except:
+            context['end_date'] = self.end_date
+        context['end_date_set'] = self.end_date_set
         return context
 
     def get_queryset(self):
-        start_date = self.kwargs['date']
-        end_date = datetime.now()
-        return PurchaseOrder.objects.filter(date__range=[start_date, end_date])
+        self.start_date = self.kwargs['date']
+        try:
+            self.end_date = self.kwargs['end_date']
+            self.end_date_set = True
+        except:
+            self.end_date = max([item.date for item in CustomerOrder.objects.all()])
+            self.end_date_set = False
+        return PurchaseOrder.objects.filter(date__range=[self.start_date, self.end_date]).order_by('date')
         
 
 class CustomerOrderDateFilterList(ListView):
-    model = PurchaseOrder
+    model = CustomerOrder
     template_name = 'inventory/customer_orders.html'
     ordering = ['date']
 
     def get_context_data(self, **kwargs):
-        co_count = self.get_queryset().count()
         context = super().get_context_data(**kwargs)
+        co_count = self.get_queryset().count()
         context['co_filter_count'] = co_count
-        context['filter_date'] = self.kwargs['date'].date()
+        context['start_date'] = self.start_date.date()
+        try:
+            context['end_date'] = self.end_date.date()
+        except:
+            context['end_date'] = self.end_date
+        context['end_date_set'] = self.end_date_set
         return context
 
     def get_queryset(self):
-        start_date = self.kwargs['date']
-        end_date = datetime.now()
-        return CustomerOrder.objects.filter(date__range=[start_date, end_date])
+        self.start_date = self.kwargs['date']
+        try:
+            self.end_date = self.kwargs['end_date']
+            self.end_date_set = True
+        except:
+            self.end_date = max([item.date for item in CustomerOrder.objects.all()])
+            self.end_date_set = False
+        return CustomerOrder.objects.filter(date__range=[self.start_date, self.end_date]).order_by('date')
 
 
 class CustomerOrderDetail(DetailView):
