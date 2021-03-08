@@ -1,18 +1,13 @@
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 
 class Product(models.Model):
     name = models.CharField(max_length=40)
     label = models.SlugField(max_length=40, null=True)
-    inventory = models.IntegerField()
-    par_stock = models.IntegerField()
 
     def __str__(self):
         return f'{self.name}'
-
-    @property
-    def stock_error(self):
-        return f'{self.inventory - self.par_stock}'
 
 
 class PurchaseOrder(models.Model):
@@ -48,6 +43,20 @@ class CustomerOrder(models.Model):
     def __str__(self):
         return f'{self.order_number}: {self.customer.name[:5]}: {self.quantity} {self.product.name}'
 
-    def get_absolute_url(self):
-        return reverse('customerorder-detail', kwargs={'pk': self.pk})
-        
+
+class InventoryRecord(models.Model):
+    amount = models.IntegerField()
+    date = models.DateField(default=timezone.now)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'{self.amount} {self.product.name} on {self.date}'
+
+
+class ParStockRecord(models.Model):
+    amount = models.IntegerField()
+    date = models.DateField(default=timezone.now)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'{self.amount} {self.product.name} on {self.date}'
