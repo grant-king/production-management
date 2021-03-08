@@ -10,7 +10,7 @@
 </head>
 <body>
     <h1>
-        {{ product.name }} Product Detail
+        Product Summary for {{ product.name }}
     </h1>
     <table>
         <tr>
@@ -24,12 +24,12 @@
         </tr>
         
         <tr>
-            <td><p>{{ product.inventory}} + {{ purchase_orders_total }} - {{ customer_orders_total }} = </p>{{ available }}</td>
+            <td><p>{{ inventory}} + {{ purchase_orders_total }} - {{ customer_orders_total }} = </p>{{ available }}</td>
             <td>{{ purchase_orders_total }}</td>
             <td>{{ customer_orders_total }}</td>
-            <td>{{ product.inventory }}</td>
-            <td>{{ product.par_stock }}</td>
-            <td>{{ product.stock_error }}</td>
+            <td>{{ inventory }}</td>
+            <td>{{ par_stock }}</td>
+            <td>{{ stock_error }}</td>
         </tr>
     </table>
     <br>

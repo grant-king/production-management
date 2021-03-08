@@ -1,11 +1,14 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import DetailView, ListView
-from .models import CustomerOrder, PurchaseOrder, Product, Customer
+from .models import CustomerOrder, PurchaseOrder, Product, Customer, InventoryRecord, ParStockRecord
 from datetime import datetime
 
 def index(request):
     product_list = Product.objects.all()
     calculated_inventories = []
+    calculated_errors = []
+    recent_inventories = []
+    recent_par_stocks = []
     rpo_sums = []
     rco_sums = []
     for item in product_list:
@@ -13,11 +16,25 @@ def index(request):
         rco_sum = sum([customer_order.quantity for customer_order in related_customer_orders])
         related_purchase_orders = PurchaseOrder.objects.filter(product=item)
         rpo_sum = sum([purchase_order.total for purchase_order in related_purchase_orders])
-        calculated_inventories.append(item.inventory + rpo_sum - rco_sum)
+        try:
+            recent_inventory = InventoryRecord.objects.filter(product=item).order_by('-date').first().amount
+        except:
+            recent_inventory = 0
+        try:
+            recent_par_stock = ParStockRecord.objects.filter(product=item).order_by('-date').first().amount
+        except:
+            recent_par_stock = 0
+        recent_inventories.append(recent_inventory)
+        recent_par_stocks.append(recent_par_stock)
+        calculated_inventories.append(recent_inventory + rpo_sum - rco_sum)
+        calculated_errors.append(recent_inventory - recent_par_stock)
         rpo_sums.append(rpo_sum)
         rco_sums.append(rco_sum)
 
-    context = {'product_inventories': zip(product_list, calculated_inventories, rpo_sums, rco_sums)}
+    context = {'product_inventories': zip(
+        product_list, calculated_inventories, rpo_sums, 
+        rco_sums, recent_inventories, recent_par_stocks, calculated_errors
+        )}
 
     return render(request, 'inventory/index.html', context)
 
@@ -45,18 +62,30 @@ class ProductOrders(DetailView):
     slug_url_kwarg = 'product'
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         self.product = self.get_object()
         self.related_customer_orders = CustomerOrder.objects.filter(product=self.product)
         self.related_purchase_orders = PurchaseOrder.objects.filter(product=self.product)
+        try:
+            self.recent_inventory_record = InventoryRecord.objects.filter(product=self.product).order_by('-date').first().amount
+        except:
+            self.recent_inventory_record = 0
+        try:
+            self.recent_par_stock_record = ParStockRecord.objects.filter(product=self.product).order_by('-date').first().amount
+        except:
+            self.recent_par_stock_record = 0
         rco_sum = sum([customer_order.quantity for customer_order in self.related_customer_orders])
         rpo_sum = sum([purchase_order.total for purchase_order in self.related_purchase_orders])
-        calculated_inventory = self.product.inventory + rpo_sum - rco_sum
-
-        context = super().get_context_data(**kwargs)
+        calculated_inventory = self.recent_inventory_record + rpo_sum - rco_sum
+        stock_error = self.recent_inventory_record - self.recent_par_stock_record
+        
         context['product'] = self.product
         context['available'] = calculated_inventory
         context['customer_orders_total'] = rco_sum
         context['purchase_orders_total'] = rpo_sum
+        context['inventory'] = self.recent_inventory_record
+        context['par_stock'] = self.recent_par_stock_record
+        context['stock_error'] = stock_error
         context['related_customer_orders'] = self.related_customer_orders
         context['related_purchase_orders'] = self.related_purchase_orders
 
@@ -82,14 +111,26 @@ class ProductOrdersDateFilter(DetailView):
         self.product = self.get_object()
         self.related_customer_orders = CustomerOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('date')
         self.related_purchase_orders = PurchaseOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('date')
+        try:
+            self.recent_inventory_record = InventoryRecord.objects.filter(product=self.product).order_by('-date').first().amount
+        except:
+            self.recent_inventory_record = 0
+        try:
+            self.recent_par_stock_record = ParStockRecord.objects.filter(product=self.product).order_by('-date').first().amount
+        except:
+            self.recent_par_stock_record = 0
         rco_sum = sum([customer_order.quantity for customer_order in self.related_customer_orders])
         rpo_sum = sum([purchase_order.total for purchase_order in self.related_purchase_orders])
-        calculated_inventory = self.product.inventory + rpo_sum - rco_sum
-        
+        calculated_inventory = self.recent_inventory_record + rpo_sum - rco_sum
+        stock_error = self.recent_inventory_record - self.recent_par_stock_record
+      
         context['product'] = self.product
         context['available'] = calculated_inventory
         context['customer_orders_total'] = rco_sum
         context['purchase_orders_total'] = rpo_sum
+        context['inventory'] = self.recent_inventory_record
+        context['par_stock'] = self.recent_par_stock_record
+        context['stock_error'] = stock_error
         context['related_customer_orders'] = self.related_customer_orders
         context['related_purchase_orders'] = self.related_purchase_orders
         context['co_filter_count'] = self.related_customer_orders.count()

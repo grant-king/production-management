@@ -21,15 +21,15 @@
             <th>Par Stock</th>
             <th>Stock Error</th>
         </tr>
-        {% for product, available, purchase_orders, customer_orders in product_inventories %}
+        {% for product, available, purchase_orders, customer_orders, inventory, par_stock, stock_error in product_inventories %}
         <tr>
             <td><a href="{% url 'product_orders' product.label %}">{{ product.name }}</a></td>
             <td>{{ available }}</a></td>
             <td>{{ purchase_orders }}</td>
             <td>{{ customer_orders }}</td>
-            <td>{{product.inventory}}</td>
-            <td>{{product.par_stock}}</td>
-            <td>{{product.stock_error}}</td>
+            <td>{{inventory}}</td>
+            <td>{{par_stock}}</td>
+            <td>{{stock_error}}</td>
         </tr>
         {% endfor %}
     </table>
