@@ -6,8 +6,8 @@ Keep track of products, customers and customer POs, factory POs, actual inventor
 
 ## Screenshots
 #### Product List
-![Product List](https://raw.githubusercontent.com/grant-king/production-management/main/screenshots/inventory.png?token=ADHO56DO7HURTHPKQPTMQMTAIYJMS)
+![Product List](https://github.com/grant-king/production-management/blob/main/screenshots/inventory.png?raw=true)
 
 ---
 #### Product Overview
-![Product Overview](https://raw.githubusercontent.com/grant-king/production-management/main/screenshots/product_overview.png?token=ADHO56GEOSS677NS2HKOL3TAIYJQK)
+![Product Overview](https://github.com/grant-king/production-management/blob/main/screenshots/product_overview.png?raw=true)
