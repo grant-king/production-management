@@ -23,7 +23,7 @@
         </tr>
         {% for product, available, purchase_orders, customer_orders, inventory, par_stock, stock_error in product_inventories %}
         <tr>
-            <td><a href="{% url 'product_orders' product.label %}">{{ product.name }}</a></td>
+            <td><a href="{% url 'inventory:product_orders' product.label %}">{{ product.name }}</a></td>
             <td>{{ available }}</a></td>
             <td>{{ purchase_orders }}</td>
             <td>{{ customer_orders }}</td>
@@ -35,7 +35,7 @@
     </table>
     <br>
     <hr>
-    <a href="{% url 'all_purchase_orders' %}">all Purchase Orders</a><br>
-    <a href="{% url 'all_customer_orders' %}">all Customer Orders</a>
+    <a href="{% url 'inventory:all_purchase_orders' %}">all Purchase Orders</a><br>
+    <a href="{% url 'inventory:all_customer_orders' %}">all Customer Orders</a>
 </body>
 </html>

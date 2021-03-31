@@ -14,8 +14,8 @@
     <table>
         <tr>
             <th>Available Product</th>
-            <th><a href="{% url 'product_purchase_orders' product.label %}">Purchase Order Total</a></th>
-            <th><a href="{% url 'product_customer_orders' product.label %}">Customer Order Total</a></th>
+            <th><a href="{% url 'inventory:product_purchase_orders' product.label %}">Purchase Order Total</a></th>
+            <th><a href="{% url 'inventory:product_customer_orders' product.label %}">Customer Order Total</a></th>
             <th>Inventory</th>
             <th>Par Stock</th>
             <th>Stock Error</th>
@@ -34,6 +34,6 @@
     </table>
     <br>
     <hr>
-    <a href="{% url 'index' %}">back to all inventory</a>
+    <a href="{% url 'inventory:index' %}">back to all inventory</a>
 </body>
 </html>

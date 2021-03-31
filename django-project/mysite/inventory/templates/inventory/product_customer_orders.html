@@ -26,14 +26,14 @@
         {% for related_customer_order in object_list %}
         <tr>
             <td>{{ related_customer_order.order_number }}</td>
-            <td><a href="{% url 'customer_customer_orders' related_customer_order.customer.label %}">{{ related_customer_order.customer.name }}</a></td>
-            <td><a href="{% url 'date_filter_product_customer_orders' related_customer_order.product.label related_customer_order.date %}">{{ related_customer_order.date }}</a></td>
+            <td><a href="{% url 'inventory:customer_customer_orders' related_customer_order.customer.label %}">{{ related_customer_order.customer.name }}</a></td>
+            <td><a href="{% url 'inventory:date_filter_product_customer_orders' related_customer_order.product.label related_customer_order.date %}">{{ related_customer_order.date }}</a></td>
             <td>{{ related_customer_order.quantity }}</td>
         </tr>
         {% endfor %}
     </table>
     <br>
     <hr>
-    <a href="{% url 'index' %}">back to all inventory</a>
+    <a href="{% url 'inventory:index' %}">back to all inventory</a>
 </body>
 </html>

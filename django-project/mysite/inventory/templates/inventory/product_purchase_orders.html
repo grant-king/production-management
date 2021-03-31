@@ -21,7 +21,7 @@
         </tr>
         {% for related_purchase_order in object_list %}
         <tr>
-            <td><a href="{% url 'purchase_order_detail' related_purchase_order.pk %}">{{ related_purchase_order.order_number }}</a></td>
+            <td><a href="{% url 'inventory:purchase_order_detail' related_purchase_order.pk %}">{{ related_purchase_order.order_number }}</a></td>
             <td>{{ related_purchase_order.date }}</td>
             <td>{{ related_purchase_order.runs }}</td>
             <td>{{ related_purchase_order.run_quantity }}</td>
@@ -31,6 +31,6 @@
     </table>
     <br>
     <hr>
-    <a href="{% url 'index' %}">back to all inventory</a>
+    <a href="{% url 'inventory:index' %}">back to all inventory</a>
 </body>
 </html>

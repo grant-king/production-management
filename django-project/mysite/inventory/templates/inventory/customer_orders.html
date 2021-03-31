@@ -26,20 +26,20 @@
         </tr>
         {% for customer_order in object_list %}
         <tr>
-            <td><a href="{% url 'customer_order_detail' customer_order.pk %}">{{ customer_order.order_number }}</a></td>
-            <td><a href="{% url 'product_orders' customer_order.product.label %}">{{ customer_order.product.name }}</a></td>
+            <td><a href="{% url 'inventory:customer_order_detail' customer_order.pk %}">{{ customer_order.order_number }}</a></td>
+            <td><a href="{% url 'inventory:product_orders' customer_order.product.label %}">{{ customer_order.product.name }}</a></td>
             {% if end_date_set or not start_date %}
-            <td><a href="{% url 'date_filter_customer_orders' customer_order.date %}">{{ customer_order.date }}</a></td>
+            <td><a href="{% url 'inventory:date_filter_customer_orders' customer_order.date %}">{{ customer_order.date }}</a></td>
             {% else %}
-            <td><a href="{% url 'date_range_filter_customer_orders' start_date|date:'Y-m-d' customer_order.date %}">{{ customer_order.date }}</a></td>
+            <td><a href="{% url 'inventory:date_range_filter_customer_orders' start_date|date:'Y-m-d' customer_order.date %}">{{ customer_order.date }}</a></td>
             {% endif %}
             <td>{{ customer_order.quantity }}</td>
-            <td><a href="{% url 'customer_customer_orders' customer_order.customer.label %}">{{ customer_order.customer.name }}</a></td>
+            <td><a href="{% url 'inventory:customer_customer_orders' customer_order.customer.label %}">{{ customer_order.customer.name }}</a></td>
         </tr>
         {% endfor %}
     </table>
     <br>
     <hr>
-    <a href="{% url 'index' %}">back to all inventory</a>
+    <a href="{% url 'inventory:index' %}">back to all inventory</a>
 </body>
 </html>

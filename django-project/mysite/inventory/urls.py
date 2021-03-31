@@ -22,6 +22,8 @@ class DateConverter:
 
 register_converter(DateConverter, 'yyyy')
 
+app_name = 'inventory'
+
 urlpatterns = [
     path('', views.index, name='index'),
     path('customer_orders/product/<slug:product>/', ProductCustomerOrderList.as_view(), name='product_customer_orders'),

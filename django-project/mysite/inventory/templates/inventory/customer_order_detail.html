@@ -21,14 +21,14 @@
         </tr>
         <tr>
             <td>{{ object.order_number }}</td>
-            <td><a href="{% url 'product_detail' object.product.label %}">{{ object.product.name }}</a></td>
+            <td><a href="{% url 'inventory:product_detail' object.product.label %}">{{ object.product.name }}</a></td>
             <td>{{ object.date }}</td>
             <td>{{ object.quantity }}</td>
-            <td><a href="{% url 'customer_customer_orders' object.customer.label %}">{{ object.customer.name }}</a></td>
+            <td><a href="{% url 'inventory:customer_customer_orders' object.customer.label %}">{{ object.customer.name }}</a></td>
         </tr>
     </table>
     <br>
     <hr>
-    <a href="{% url 'index' %}">back to all inventory</a>
+    <a href="{% url 'inventory:index' %}">back to all inventory</a>
 </body>
 </html>
