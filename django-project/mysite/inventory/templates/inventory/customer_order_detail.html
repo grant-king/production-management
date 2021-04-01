@@ -1,13 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-    table {width:100%;}
-    th, td {border:1px solid black;}
-    th p {font-size: 50%;}
-</style>
-</head>
-<body>
+{% extends "inventory/base.html" %}
+{% block content %}
     <h1>
         Customer Order {{ object.order_number }} Detail
     </h1>
@@ -30,5 +22,4 @@
     <br>
     <hr>
     <a href="{% url 'inventory:index' %}">back to all inventory</a>
-</body>
-</html>
+{% endblock content %}

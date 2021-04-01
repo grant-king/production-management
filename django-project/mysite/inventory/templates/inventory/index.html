@@ -1,13 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-    table {width:100%;}
-    th, td {border:1px solid black;}
-    th p {font-size: 50%;}
-</style>
-</head>
-<body>
+{% extends "inventory/base.html" %}
+{% block content %}
     <h1>
         Product Inventory
     </h1>
@@ -37,5 +29,4 @@
     <hr>
     <a href="{% url 'inventory:all_purchase_orders' %}">all Purchase Orders</a><br>
     <a href="{% url 'inventory:all_customer_orders' %}">all Customer Orders</a>
-</body>
-</html>
+{% endblock content %}

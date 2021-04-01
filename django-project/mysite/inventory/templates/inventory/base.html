@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    table {width:100%;}
+    th, td {border:1px solid black;}
+    th p {font-size: 50%;}
+    td p {font-size: 75%;}
+
+</style>
+</head>
+<body>
+{% if messages %}
+{% for message in messages %}
+{{ message }}
+{% endfor %}
+{% endif %}
+
+{% block content %}
+{% endblock content %}
+
+</body>
+</html>
