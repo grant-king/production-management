@@ -16,6 +16,18 @@
 {% endfor %}
 {% endif %}
 
+<div>
+    {% if user.is_authenticated %}
+    <a href="{% url 'users:logout' %}">log out | </a>
+    <a href="{% url 'users:profile' %}">user profile | </a>
+    {% else %}
+    <a href="{% url 'users:login' %}">log in | </a>
+    {% endif %}
+    <a href="{% url 'inventory:index' %}">inventory home</a>
+    
+    
+</div>
+
 {% block content %}
 {% endblock content %}
 
