@@ -1,2 +1,3 @@
 
 *.pyc
+django-project/mysite/media/*
