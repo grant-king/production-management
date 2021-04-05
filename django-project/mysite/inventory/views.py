@@ -1,10 +1,14 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView
 from .models import CustomerOrder, PurchaseOrder, Product, Customer, InventoryRecord, ParStockRecord
 from datetime import datetime
 
+@login_required
 def index(request):
-    product_list = Product.objects.all()
+    product_list = Product.objects.filter(user=request.user)
     calculated_inventories = []
     calculated_errors = []
     recent_inventories = []
@@ -38,6 +42,7 @@ def index(request):
 
     return render(request, 'inventory/index.html', context)
 
+@login_required
 def product_detail(request, product):
     product = Product.objects.get(label=product)
     related_customer_orders = CustomerOrder.objects.filter(product=product)
@@ -55,6 +60,7 @@ def product_detail(request, product):
     return render(request, 'inventory/product_detail.html', context)
 
 
+@method_decorator(login_required, name='dispatch')
 class ProductOrders(DetailView):
     template_name = 'inventory/product_order_detail.html'
     model = Product
@@ -92,6 +98,7 @@ class ProductOrders(DetailView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class ProductOrdersDateFilter(DetailView):
     template_name = 'inventory/product_order_detail.html'
     model = Product
@@ -144,6 +151,7 @@ class ProductOrdersDateFilter(DetailView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class ProductCustomerOrderList(ListView):
     template_name = 'inventory/product_customer_orders.html'
     
@@ -157,6 +165,7 @@ class ProductCustomerOrderList(ListView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class ProductCustomerOrderDateFilterList(ListView):
     template_name = 'inventory/product_customer_orders.html'
     ordering = ['date']
@@ -175,7 +184,8 @@ class ProductCustomerOrderDateFilterList(ListView):
         context['filter_date'] = self.kwargs['date'].date()
         return context
 
-    
+
+@method_decorator(login_required, name='dispatch')
 class ProductPurchaseOrderList(ListView):
     template_name = 'inventory/product_purchase_orders.html'
     
@@ -190,12 +200,15 @@ class ProductPurchaseOrderList(ListView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class CustomerCustomerOrderList(ListView):
     template_name = 'inventory/customer_customer_orders.html'
     
     def get_queryset(self):
         self.customer = get_object_or_404(Customer, label=self.kwargs['customer'])
-        return CustomerOrder.objects.filter(customer=self.customer).order_by('date')
+        return CustomerOrder.objects.filter(
+            customer=self.customer, product__user=self.request.user
+            ).order_by('date')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -204,23 +217,29 @@ class CustomerCustomerOrderList(ListView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class PurchaseOrderDetail(DetailView):
     model = PurchaseOrder
     template_name = 'inventory/purchase_order_detail.html'
 
 
+@method_decorator(login_required, name='dispatch')
 class PurchaseOrderList(ListView):
     model = PurchaseOrder
     template_name = 'inventory/purchase_orders.html'
     ordering = ['date']
 
+    def get_queryset(self):
+        return PurchaseOrder.objects.filter(product__user=self.request.user)
+
     def get_context_data(self, **kwargs):
-        po_count = PurchaseOrder.objects.count()
+        po_count = self.get_queryset().count()
         context = super().get_context_data(**kwargs)
         context['po_count'] = po_count
         return context
 
 
+@method_decorator(login_required, name='dispatch')
 class PurchaseOrderDateFilterList(ListView):
     model = PurchaseOrder
     template_name = 'inventory/purchase_orders.html'
@@ -246,9 +265,12 @@ class PurchaseOrderDateFilterList(ListView):
         except:
             self.end_date = max([item.date for item in CustomerOrder.objects.all()])
             self.end_date_set = False
-        return PurchaseOrder.objects.filter(date__range=[self.start_date, self.end_date]).order_by('date')
+        return PurchaseOrder.objects.filter(
+            product__user=self.request.user,
+            date__range=[self.start_date, self.end_date]).order_by('date')
         
 
+@method_decorator(login_required, name='dispatch')
 class CustomerOrderDateFilterList(ListView):
     model = CustomerOrder
     template_name = 'inventory/customer_orders.html'
@@ -274,21 +296,28 @@ class CustomerOrderDateFilterList(ListView):
         except:
             self.end_date = max([item.date for item in CustomerOrder.objects.all()])
             self.end_date_set = False
-        return CustomerOrder.objects.filter(date__range=[self.start_date, self.end_date]).order_by('date')
+        return CustomerOrder.objects.filter(
+            product__user=self.request.user,
+            date__range=[self.start_date, self.end_date]).order_by('date')
 
 
+@method_decorator(login_required, name='dispatch')
 class CustomerOrderDetail(DetailView):
     model = CustomerOrder
     template_name = 'inventory/customer_order_detail.html'
 
 
+@method_decorator(login_required, name='dispatch')
 class CustomerOrderList(ListView):
     model = CustomerOrder
     template_name = 'inventory/customer_orders.html'
     ordering = ['date', 'product']
 
+    def get_queryset(self):
+        return CustomerOrder.objects.filter(product__user=self.request.user)
+
     def get_context_data(self, **kwargs):
-        co_count = CustomerOrder.objects.count()
+        co_count = self.get_queryset().count()
         context = super().get_context_data(**kwargs)
         context['co_count'] = co_count
         return context
