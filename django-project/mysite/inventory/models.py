@@ -11,6 +11,9 @@ class Product(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    def get_absolute_url(self):
+        return reverse('inventory:product_detail', kwargs={'label': self.label})
+
 
 class PurchaseOrder(models.Model):
     order_number = models.CharField(max_length=10)
@@ -25,6 +28,10 @@ class PurchaseOrder(models.Model):
     @property
     def total(self):
         return self.run_quantity * self.runs
+    
+    def get_absolute_url(self):
+        return reverse('inventory:purchase_order_detail', kwargs={'pk': self.pk})
+
 
 
 class Customer(models.Model):

@@ -25,8 +25,17 @@
         </tr>
         {% endfor %}
     </table>
+    <div>
     <br>
     <hr>
     <a href="{% url 'inventory:all_purchase_orders' %}">all Purchase Orders</a><br>
     <a href="{% url 'inventory:all_customer_orders' %}">all Customer Orders</a>
+    </div>
+    <div>
+    <br>
+    <hr>
+    <a href="{% url 'inventory:purchase_order_create' %}">Add a new Purchase Order</a><br>
+    <a href="{% url 'inventory:product_create' %}">Add a new Product</a>
+    </div>
+
 {% endblock content %}

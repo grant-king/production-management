@@ -2,8 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView
-from .models import CustomerOrder, PurchaseOrder, Product, Customer, InventoryRecord, ParStockRecord
+from django.views.generic import DetailView, ListView, CreateView
+from .models import (
+    CustomerOrder, PurchaseOrder, Product, Customer, 
+    InventoryRecord, ParStockRecord
+)
 from datetime import datetime
 
 @login_required
@@ -49,12 +52,24 @@ def product_detail(request, product):
     rco_sum = sum([customer_order.quantity for customer_order in related_customer_orders])
     related_purchase_orders = PurchaseOrder.objects.filter(product=product)
     rpo_sum = sum([purchase_order.total for purchase_order in related_purchase_orders])
-    calculated_inventory = product.inventory + rpo_sum - rco_sum
+    try:
+        recent_inventory = InventoryRecord.objects.filter(product=item).order_by('-date').first().amount
+    except:
+        recent_inventory = 0
+    try:
+        recent_par_stock = ParStockRecord.objects.filter(product=item).order_by('-date').first().amount
+    except:
+        recent_par_stock = 0
+    calculated_inventory = recent_inventory + rpo_sum - rco_sum
+    stock_error = recent_inventory - recent_par_stock
     context = {
         'product': product,
         'available': calculated_inventory,
         'customer_orders': rco_sum,
         'purchase_orders': rpo_sum,
+        'recent_inventory': recent_inventory,
+        'recent_par_stock': recent_par_stock,
+        'stock_error': stock_error,
     }
     
     return render(request, 'inventory/product_detail.html', context)
@@ -321,3 +336,20 @@ class CustomerOrderList(ListView):
         context = super().get_context_data(**kwargs)
         context['co_count'] = co_count
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+class PurchaseOrderCreate(CreateView):
+    model = PurchaseOrder
+    fields = ['order_number', 'product', 'runs', 'run_quantity', 'date']
+
+
+@method_decorator(login_required, name='dispatch')
+class ProductCreate(CreateView):
+    model = Product
+    fields = ['name', 'label']
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
