@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, CreateView
 from .models import (
@@ -75,8 +76,7 @@ def product_detail(request, product):
     return render(request, 'inventory/product_detail.html', context)
 
 
-@method_decorator(login_required, name='dispatch')
-class ProductOrders(DetailView):
+class ProductOrders(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     template_name = 'inventory/product_order_detail.html'
     model = Product
     slug_field = 'label'
@@ -112,9 +112,14 @@ class ProductOrders(DetailView):
 
         return context
 
+    def test_func(self):
+        if self.get_object().user == self.request.user:
+            return True
+        else:
+            return False
 
-@method_decorator(login_required, name='dispatch')
-class ProductOrdersDateFilter(DetailView):
+
+class ProductOrdersDateFilter(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     template_name = 'inventory/product_order_detail.html'
     model = Product
     slug_field = 'label'
@@ -165,9 +170,14 @@ class ProductOrdersDateFilter(DetailView):
 
         return context
 
+    def test_func(self):
+        if self.get_object().user == self.request.user:
+            return True
+        else:
+            return False
 
-@method_decorator(login_required, name='dispatch')
-class ProductCustomerOrderList(ListView):
+
+class ProductCustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'inventory/product_customer_orders.html'
     
     def get_queryset(self):
@@ -179,9 +189,14 @@ class ProductCustomerOrderList(ListView):
         context['product'] = self.product
         return context
 
+    def test_func(self):
+        if Product.objects.get(label=self.kwargs['product']).user == self.request.user:
+            return True
+        else:
+            return False
 
-@method_decorator(login_required, name='dispatch')
-class ProductCustomerOrderDateFilterList(ListView):
+
+class ProductCustomerOrderDateFilterList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'inventory/product_customer_orders.html'
     ordering = ['date']
 
@@ -199,9 +214,14 @@ class ProductCustomerOrderDateFilterList(ListView):
         context['filter_date'] = self.kwargs['date'].date()
         return context
 
+    def test_func(self):
+        if Product.objects.get(label=self.kwargs['product']).user == self.request.user:
+            return True
+        else:
+            return False
 
-@method_decorator(login_required, name='dispatch')
-class ProductPurchaseOrderList(ListView):
+
+class ProductPurchaseOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'inventory/product_purchase_orders.html'
     
     def get_queryset(self):
@@ -214,9 +234,14 @@ class ProductPurchaseOrderList(ListView):
 
         return context
 
+    def test_func(self):
+        if Product.objects.get(label=self.kwargs['product']).user == self.request.user:
+            return True
+        else:
+            return False
 
-@method_decorator(login_required, name='dispatch')
-class CustomerCustomerOrderList(ListView):
+
+class CustomerCustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'inventory/customer_customer_orders.html'
     
     def get_queryset(self):
@@ -231,15 +256,25 @@ class CustomerCustomerOrderList(ListView):
 
         return context
 
+    def test_func(self):
+        if self.get_queryset().first().product.user == self.request.user:
+            return True
+        else:
+            return False
 
-@method_decorator(login_required, name='dispatch')
-class PurchaseOrderDetail(DetailView):
+
+class PurchaseOrderDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = PurchaseOrder
     template_name = 'inventory/purchase_order_detail.html'
 
+    def test_func(self):
+        if self.get_object().product.user == self.request.user:
+            return True
+        else:
+            return False
 
-@method_decorator(login_required, name='dispatch')
-class PurchaseOrderList(ListView):
+
+class PurchaseOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = PurchaseOrder
     template_name = 'inventory/purchase_orders.html'
     ordering = ['date']
@@ -253,9 +288,14 @@ class PurchaseOrderList(ListView):
         context['po_count'] = po_count
         return context
 
+    def test_func(self):
+        if self.get_queryset().first().product.user == self.request.user:
+            return True
+        else:
+            return False
 
-@method_decorator(login_required, name='dispatch')
-class PurchaseOrderDateFilterList(ListView):
+
+class PurchaseOrderDateFilterList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = PurchaseOrder
     template_name = 'inventory/purchase_orders.html'
     ordering = ['date']
@@ -283,10 +323,15 @@ class PurchaseOrderDateFilterList(ListView):
         return PurchaseOrder.objects.filter(
             product__user=self.request.user,
             date__range=[self.start_date, self.end_date]).order_by('date')
+
+    def test_func(self):
+        if self.get_queryset().first().product.user == self.request.user:
+            return True
+        else:
+            return False
         
 
-@method_decorator(login_required, name='dispatch')
-class CustomerOrderDateFilterList(ListView):
+class CustomerOrderDateFilterList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = CustomerOrder
     template_name = 'inventory/customer_orders.html'
     ordering = ['date']
@@ -314,16 +359,26 @@ class CustomerOrderDateFilterList(ListView):
         return CustomerOrder.objects.filter(
             product__user=self.request.user,
             date__range=[self.start_date, self.end_date]).order_by('date')
+    
+    def test_func(self):
+        if self.get_queryset().first().product.user == self.request.user:
+            return True
+        else:
+            return False
 
 
-@method_decorator(login_required, name='dispatch')
-class CustomerOrderDetail(DetailView):
+class CustomerOrderDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = CustomerOrder
     template_name = 'inventory/customer_order_detail.html'
 
+    def test_func(self):
+        if self.get_object().product.user == self.request.user:
+            return True
+        else:
+            return False
 
-@method_decorator(login_required, name='dispatch')
-class CustomerOrderList(ListView):
+
+class CustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = CustomerOrder
     template_name = 'inventory/customer_orders.html'
     ordering = ['date', 'product']
@@ -337,15 +392,19 @@ class CustomerOrderList(ListView):
         context['co_count'] = co_count
         return context
 
+    def test_func(self):
+        if self.get_queryset().first().product.user == self.request.user:
+            return True
+        else:
+            return False
 
-@method_decorator(login_required, name='dispatch')
-class PurchaseOrderCreate(CreateView):
+
+class PurchaseOrderCreate(LoginRequiredMixin, CreateView):
     model = PurchaseOrder
     fields = ['order_number', 'product', 'runs', 'run_quantity', 'date']
 
 
-@method_decorator(login_required, name='dispatch')
-class ProductCreate(CreateView):
+class ProductCreate(LoginRequiredMixin, CreateView):
     model = Product
     fields = ['name', 'label']
 
