@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView, CreateView
+from django.views.generic import DetailView, ListView, CreateView, UpdateView
 from .models import (
     CustomerOrder, PurchaseOrder, Product, Customer, 
     InventoryRecord, ParStockRecord
@@ -404,6 +404,17 @@ class PurchaseOrderCreate(LoginRequiredMixin, CreateView):
     fields = ['order_number', 'product', 'runs', 'run_quantity', 'date']
 
 
+class PurchaseOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = PurchaseOrder
+    fields = ['order_number', 'product', 'runs', 'run_quantity', 'date']
+
+    def test_func(self):
+        if self.get_object().product.user == self.request.user:
+            return True
+        else:
+            return False
+
+
 class ProductCreate(LoginRequiredMixin, CreateView):
     model = Product
     fields = ['name', 'label']
@@ -412,3 +423,19 @@ class ProductCreate(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
+
+class ProductUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Product
+    fields = ['name', 'label']
+    slug_field = 'label'
+    slug_url_kwarg = 'product'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        if self.get_object().user == self.request.user:
+            return True
+        else:
+            return False

@@ -5,11 +5,20 @@
     <form method="POST">
         {% csrf_token %}
         <fieldset>
-            <legend>Create a new Purchase Order</legend>
+            {% if object %}
+            <legend>Update this product</legend>
+            {% else %}
+            <legend>Create a new product</legend>
+            {% endif %}
             {{ form|crispy }}
         </fieldset>
         <div>
+            {% if object %}
+            <button type="submit">Update</button>
+            {% else %}
             <button type="submit">Create</button>
+            {% endif %}
+            
         </div>
     </form>
 </div>
