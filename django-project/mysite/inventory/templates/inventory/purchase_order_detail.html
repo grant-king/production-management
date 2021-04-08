@@ -3,6 +3,9 @@
     <h1>
         Purchase Order {{object.order_number}} Detail
     </h1>
+    <p>
+    <small><a href="{% url 'inventory:purchase_order_update' object.pk %}">Edit this Purchase Order</a></small>
+    </p>
     <table>
         <tr>
             <th>Order Number</th>

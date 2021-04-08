@@ -1,8 +1,11 @@
 {% extends "inventory/base.html" %}
 {% block content %}
     <h1>
-        Product Summary for {{ product.name }}
+        Product Summary for {{ product.name }} 
     </h1>
+    <p>
+    <small><a href="{% url 'inventory:product_update' product.label %}">Edit this Product</a></small>
+    </p>
     <table>
         <tr>
             <th>Available Product<p>(inventory + PO's - Customer Orders )</p></th>
