@@ -12,7 +12,7 @@ class Product(models.Model):
         return f'{self.name}'
 
     def get_absolute_url(self):
-        return reverse('inventory:product_detail', kwargs={'label': self.label})
+        return reverse('inventory:product_detail', kwargs={'product': self.label})
 
 
 class PurchaseOrder(models.Model):
@@ -31,7 +31,6 @@ class PurchaseOrder(models.Model):
     
     def get_absolute_url(self):
         return reverse('inventory:purchase_order_detail', kwargs={'pk': self.pk})
-
 
 
 class Customer(models.Model):
