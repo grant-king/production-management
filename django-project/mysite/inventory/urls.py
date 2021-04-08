@@ -6,7 +6,7 @@ from inventory.views import (
     CustomerOrderDetail, CustomerOrderList, PurchaseOrderDateFilterList,
     CustomerOrderDateFilterList, ProductCustomerOrderDateFilterList, 
     ProductOrders, ProductOrdersDateFilter, PurchaseOrderCreate, ProductCreate,
-    ProductUpdate, PurchaseOrderUpdate
+    ProductUpdate, PurchaseOrderUpdate, PurchaseOrderDelete, ProductDelete
 )
 from datetime import datetime
 
@@ -35,11 +35,13 @@ urlpatterns = [
     path('purchase_orders/new/', PurchaseOrderCreate.as_view(), name='purchase_order_create'),
     path('purchase_orders/<int:pk>/', PurchaseOrderDetail.as_view(), name='purchase_order_detail'),
     path('purchase_orders/<int:pk>/update/', PurchaseOrderUpdate.as_view(), name='purchase_order_update'),
+    path('purchase_orders/<int:pk>/delete/', PurchaseOrderDelete.as_view(), name='purchase_order_delete'),
     path('purchase_orders/all/', PurchaseOrderList.as_view(), name='all_purchase_orders'),
     path('customers/<customer>/', CustomerCustomerOrderList.as_view(), name='customer_customer_orders'),
     path('products/new/', ProductCreate.as_view(), name='product_create'),
-    path('products/<product>/', views.product_detail, name='product_detail'),
-    path('products/<product>/update/', ProductUpdate.as_view(), name='product_update'),
+    path('products/<slug:product>/', views.product_detail, name='product_detail'),
+    path('products/<slug:product>/update/', ProductUpdate.as_view(), name='product_update'),
+    path('products/<slug:product>/delete/', ProductDelete.as_view(), name='product_delete'),
     path('productorders/<slug:product>/', ProductOrders.as_view(), name='product_orders'),
     path('productorders/<slug:product>/<yyyy:date>/', ProductOrdersDateFilter.as_view(), name='date_filter_product_orders'),
     path('productorders/<slug:product>/<yyyy:date>/<yyyy:end_date>/', ProductOrdersDateFilter.as_view(), name='date_range_filter_product_orders'),

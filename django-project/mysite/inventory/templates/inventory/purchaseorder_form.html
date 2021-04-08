@@ -20,5 +20,10 @@
             {% endif %}
         </div>
     </form>
+    <br>
+    <hr>
+    {% if object %}
+    <small><a href="{% url 'inventory:purchase_order_delete' object.pk %}">Delete this Purchase Order</a></small>
+    {% endif %}
 </div>
 {% endblock content %}

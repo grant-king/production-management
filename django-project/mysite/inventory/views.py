@@ -1,13 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView, CreateView, UpdateView
+from django.views.generic import (
+    DetailView, ListView, CreateView, UpdateView, DeleteView)
 from .models import (
     CustomerOrder, PurchaseOrder, Product, Customer, 
-    InventoryRecord, ParStockRecord
-)
+    InventoryRecord, ParStockRecord)
 from datetime import datetime
 
 @login_required
@@ -414,6 +415,19 @@ class PurchaseOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         else:
             return False
 
+class PurchaseOrderDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = PurchaseOrder
+    
+    def get_success_url(self):
+        return reverse_lazy(
+        'inventory:product_orders', 
+        kwargs={'product': self.get_object().product.label})
+    
+    def test_func(self):
+        if self.get_object().product.user == self.request.user:
+            return True
+        else:
+            return False
 
 class ProductCreate(LoginRequiredMixin, CreateView):
     model = Product
@@ -439,3 +453,26 @@ class ProductUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             return True
         else:
             return False
+
+
+class ProductDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Product
+    slug_field = 'label'
+    slug_url_kwarg = 'product'
+
+    def test_func(self):
+        if self.get_object().user == self.request.user:
+            return True
+        else:
+            return False
+
+    def get_success_url(self):
+        return reverse_lazy('inventory:index')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            self.object.delete()
+            return redirect(self.get_success_url())
+        except:
+            return render(request, 'inventory/product_delete_error.html')
