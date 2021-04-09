@@ -1,0 +1,22 @@
+{% extends "inventory/base.html" %}
+{% block content %}
+    <h1>
+        Inventory Records related to {{ product.name }}
+    </h1>
+    <table>
+        <tr>
+            <th>Amount</th>
+            <th>Date</th>
+        </tr>
+        {% for related_inventory_record in object_list %}
+        <tr>
+            <td><a href="{% url 'inventory:inventory_record_detail' product.label related_inventory_record.pk %}">{{ related_inventory_record.amount }}</a></td>
+            <td>{{ related_inventory_record.date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="{% url 'inventory:inventory_record_create' product.label %}">add a new Inventory Record for {{ product.name }}</a><br>
+    <hr>
+    <a href="{% url 'inventory:product_orders' product.label %}">back to all orders for {{ product.name }}</a><br>
+{% endblock content %}

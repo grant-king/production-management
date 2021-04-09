@@ -8,6 +8,8 @@ from inventory.views import (
     ProductOrders, ProductOrdersDateFilter, PurchaseOrderCreate, ProductCreate,
     ProductUpdate, PurchaseOrderUpdate, PurchaseOrderDelete, ProductDelete,
     CustomerOrderCreate, CustomerOrderUpdate, CustomerOrderDelete,
+    ProductInventoryRecordList, InventoryRecordDetail, InventoryRecordCreate,
+    InventoryRecordUpdate, InventoryRecordDelete,
 )
 from datetime import datetime
 
@@ -53,4 +55,9 @@ urlpatterns = [
     path('purchase_orders/<yyyy:date>/<yyyy:end_date>/', PurchaseOrderDateFilterList.as_view(), name='date_range_filter_purchase_orders'),
     path('customer_orders/<yyyy:date>/', CustomerOrderDateFilterList.as_view(), name='date_filter_customer_orders'),
     path('customer_orders/<yyyy:date>/<yyyy:end_date>/', CustomerOrderDateFilterList.as_view(), name='date_range_filter_customer_orders'),
+    path('inventory_records/<slug:product>/', ProductInventoryRecordList.as_view(), name='product_inventory_records'),
+    path('inventory_records/<slug:product>/<int:pk>/', InventoryRecordDetail.as_view(), name='inventory_record_detail'),
+    path('inventory_records/<slug:product>/new/', InventoryRecordCreate.as_view(), name='inventory_record_create'),
+    path('inventory_records/<slug:product>/<int:pk>/update', InventoryRecordUpdate.as_view(), name='inventory_record_update'),
+    path('inventory_records/<slug:product>/<int:pk>/delete', InventoryRecordDelete.as_view(), name='inventory_record_delete'),
 ]
