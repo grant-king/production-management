@@ -1,0 +1,29 @@
+{% extends "inventory/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div>
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset>
+            {% if object %}
+            <legend>Update this Par Stock Record</legend>
+            {% else %}
+            <legend>Create a new Par Stock Record</legend>
+            {% endif %}
+            {{ form|crispy }}
+        </fieldset>
+        <div>
+            {% if object %}
+            <button type="submit">Update</button>
+            {% else %}
+            <button type="submit">Create</button>
+            {% endif %}
+        </div>
+    </form>
+    <br>
+    <hr>
+    {% if object %}
+    <small><a href="{% url 'inventory:par_stock_record_delete' object.product.label object.pk %}">Delete this Par Stock Record</a></small>
+    {% endif %}
+</div>
+{% endblock content %}

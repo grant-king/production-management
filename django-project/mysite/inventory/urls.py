@@ -9,7 +9,9 @@ from inventory.views import (
     ProductUpdate, PurchaseOrderUpdate, PurchaseOrderDelete, ProductDelete,
     CustomerOrderCreate, CustomerOrderUpdate, CustomerOrderDelete,
     ProductInventoryRecordList, InventoryRecordDetail, InventoryRecordCreate,
-    InventoryRecordUpdate, InventoryRecordDelete,
+    InventoryRecordUpdate, InventoryRecordDelete, ProductParStockRecordList,
+    ParStockRecordDetail, ParStockRecordCreate, ParStockRecordUpdate, 
+    ParStockRecordDelete,
 )
 from datetime import datetime
 
@@ -60,4 +62,9 @@ urlpatterns = [
     path('inventory_records/<slug:product>/new/', InventoryRecordCreate.as_view(), name='inventory_record_create'),
     path('inventory_records/<slug:product>/<int:pk>/update', InventoryRecordUpdate.as_view(), name='inventory_record_update'),
     path('inventory_records/<slug:product>/<int:pk>/delete', InventoryRecordDelete.as_view(), name='inventory_record_delete'),
+    path('par_stock_records/<slug:product>/', ProductParStockRecordList.as_view(), name='product_par_stock_records'),
+    path('par_stock_records/<slug:product>/<int:pk>/', ParStockRecordDetail.as_view(), name='par_stock_record_detail'),
+    path('par_stock_records/<slug:product>/new/', ParStockRecordCreate.as_view(), name='par_stock_record_create'),
+    path('par_stock_records/<slug:product>/<int:pk>/update', ParStockRecordUpdate.as_view(), name='par_stock_record_update'),
+    path('par_stock_records/<slug:product>/<int:pk>/delete', ParStockRecordDelete.as_view(), name='par_stock_record_delete'),
 ]

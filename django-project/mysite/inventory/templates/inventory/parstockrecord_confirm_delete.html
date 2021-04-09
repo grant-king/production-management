@@ -1,0 +1,14 @@
+{% extends "inventory/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div>
+    <form method="POST">
+        {% csrf_token %}
+        <p>Are you sure you want to delete this Par Stock Record?</p>
+            <p>{{ object }}</p>
+        <div>
+            <button type="submit">PERMANENTLY DELETE {{ object }}</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

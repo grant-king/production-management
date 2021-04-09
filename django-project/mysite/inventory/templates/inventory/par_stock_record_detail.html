@@ -1,0 +1,24 @@
+{% extends "inventory/base.html" %}
+{% block content %}
+    <h1>
+        Par Stock Record {{ object }} Detail
+    </h1>
+    <p>
+    <small><a href="{% url 'inventory:par_stock_record_update' object.product.label object.pk %}">Edit this Par Stock Record</a></small>
+    </p>
+    <table>
+        <tr>
+            <th>Amount</th>
+            <th>Date</th>
+        </tr>
+        <tr>
+            <td>{{ object.amount }}</td>
+            <td>{{ object.date }}</td>
+        </tr>
+    </table>
+    <br>
+    <hr>
+    <a href="{% url 'inventory:product_par_stock_records' object.product.label %}">back to {{ object.product.name }} Par Stock Records list</a><br>
+    <a href="{% url 'inventory:product_orders' object.product.label %}">back to {{ object.product.name }} overview</a>
+
+{% endblock content %}

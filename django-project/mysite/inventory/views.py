@@ -569,12 +569,88 @@ class InventoryRecordUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
         else:
             return False
 
+
 class InventoryRecordDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = InventoryRecord
 
     def get_success_url(self):
         return reverse_lazy(
         'inventory:product_inventory_records', 
+        kwargs={'product': self.get_object().product.label})
+    
+    def test_func(self):
+        if self.get_object().product.user == self.request.user:
+            return True
+        else:
+            return False
+
+
+class ProductParStockRecordList(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    template_name = 'inventory/product_par_stock_records.html'
+    
+    def get_queryset(self):
+        self.product = get_object_or_404(Product, label=self.kwargs['product'])
+        return ParStockRecord.objects.filter(product=self.product).order_by('-date')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.product
+        return context
+
+    def test_func(self):
+        if Product.objects.get(label=self.kwargs['product']).user == self.request.user:
+            return True
+        else:
+            return False
+
+
+class ParStockRecordDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = ParStockRecord
+    template_name = 'inventory/par_stock_record_detail.html'
+
+    def test_func(self):
+        if self.get_object().product.user == self.request.user:
+            return True
+        else:
+            return False
+
+
+class ParStockRecordCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = ParStockRecord
+    fields = ['amount', 'date']
+
+    def form_valid(self, form):
+        form.instance.product = Product.objects.get(label=self.kwargs['product'])
+        return super().form_valid(form)
+
+    def test_func(self):
+        if Product.objects.get(label=self.kwargs['product']).user == self.request.user:
+            return True
+        else:
+            return False
+    
+
+class ParStockRecordUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = ParStockRecord
+    fields = ['amount', 'date']
+
+    def form_valid(self, form):
+        form.instance.product = Product.objects.get(label=self.kwargs['product'])
+        return super().form_valid(form)
+
+    def test_func(self):
+        if Product.objects.get(label=self.kwargs['product']).user == self.request.user:
+            return True
+        else:
+            return False
+
+
+class ParStockRecordDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = ParStockRecord
+
+    def get_success_url(self):
+        return reverse_lazy(
+        'inventory:product_par_stock_records', 
         kwargs={'product': self.get_object().product.label})
     
     def test_func(self):

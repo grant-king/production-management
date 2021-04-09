@@ -75,3 +75,8 @@ class ParStockRecord(models.Model):
 
     def __str__(self):
         return f'{self.amount} {self.product.name} on {self.date}'
+
+    def get_absolute_url(self):
+        return reverse('inventory:par_stock_record_detail', kwargs={
+            'pk': self.pk, 'product': self.product.label})
+
