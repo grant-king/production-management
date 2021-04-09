@@ -40,6 +40,9 @@ class Customer(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    def get_absolute_url(self):
+        return reverse('inventory:customer_detail', kwargs={'pk': self.pk})
+
 
 class CustomerOrder(models.Model):
     order_number = models.CharField(max_length=10)

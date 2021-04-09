@@ -1,0 +1,20 @@
+{% extends "inventory/base.html" %}
+{% block content %}
+    <h1>
+        All Customers for {{ user.username }}
+    </h1>
+    <table>
+        <tr>
+            <th>Customer</th>
+        </tr>
+        {% for customer in object_list %}
+        <tr>
+            <td><a href="{% url 'inventory:customer_detail' customer.pk %}">{{ customer.name }}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{% url 'inventory:customer_create' user.pk %}">add new Customer</a>
+    <br>
+    <hr>
+    <a href="{% url 'inventory:index' %}">back to all inventory</a>
+{% endblock content %}

@@ -11,7 +11,8 @@ from inventory.views import (
     ProductInventoryRecordList, InventoryRecordDetail, InventoryRecordCreate,
     InventoryRecordUpdate, InventoryRecordDelete, ProductParStockRecordList,
     ParStockRecordDetail, ParStockRecordCreate, ParStockRecordUpdate, 
-    ParStockRecordDelete,
+    ParStockRecordDelete, CustomerList, CustomerDetail, CustomerCreate, 
+    CustomerUpdate, CustomerDelete,
 )
 from datetime import datetime
 
@@ -45,6 +46,11 @@ urlpatterns = [
     path('purchase_orders/<int:pk>/update/', PurchaseOrderUpdate.as_view(), name='purchase_order_update'),
     path('purchase_orders/<int:pk>/delete/', PurchaseOrderDelete.as_view(), name='purchase_order_delete'),
     path('purchase_orders/all/', PurchaseOrderList.as_view(), name='all_purchase_orders'),
+    path('customers/<int:user>/all/', CustomerList.as_view(), name='my_customers'),
+    path('customers/<int:pk>/', CustomerDetail.as_view(), name='customer_detail'),
+    path('customers/<int:user>/new/', CustomerCreate.as_view(), name='customer_create'),
+    path('customers/<int:user>/<int:pk>/update/', CustomerUpdate.as_view(), name='customer_update'),
+    path('customers/<int:user>/<int:pk>/delete/', CustomerDelete.as_view(), name='customer_delete'),
     path('customers/<customer>/', CustomerCustomerOrderList.as_view(), name='customer_customer_orders'),
     path('products/new/', ProductCreate.as_view(), name='product_create'),
     path('products/<slug:product>/', views.product_detail, name='product_detail'),

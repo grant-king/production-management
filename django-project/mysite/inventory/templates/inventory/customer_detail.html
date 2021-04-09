@@ -1,0 +1,21 @@
+{% extends "inventory/base.html" %}
+{% block content %}
+    <h1>
+        {{ object.name }} Customer Detail
+    </h1>
+    <p>
+    <small><a href="{% url 'inventory:customer_update' user.pk object.pk %}">Edit this Customer</a></small>
+    </p>
+    <table>
+        <tr>
+            <th>Customer</th>
+        </tr>
+        <tr>
+            <td>{{ object.name }}</td>
+        </tr>
+    </table>
+    <br>
+    <hr>
+    <a href="{% url 'inventory:my_customers' user.pk %}">back to {{ user.username }}'s Customer list</a><br>
+
+{% endblock content %}

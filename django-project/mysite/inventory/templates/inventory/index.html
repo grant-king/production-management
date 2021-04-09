@@ -28,8 +28,9 @@
     <div>
     <br>
     <hr>
-    <a href="{% url 'inventory:all_purchase_orders' %}">all Purchase Orders</a><br>
-    <a href="{% url 'inventory:all_customer_orders' %}">all Customer Orders</a>
+    <a href="{% url 'inventory:all_purchase_orders' %}">My Purchase Orders</a><br>
+    <a href="{% url 'inventory:all_customer_orders' %}">My Customer Orders</a><br>
+    <a href="{% url 'inventory:my_customers' request.user.pk %}">My Customers</a><br>
     </div>
     <div>
     <br>

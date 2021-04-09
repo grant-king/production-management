@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils.decorators import method_decorator
+from django.utils.text import slugify
 from django.views.generic import (
     DetailView, ListView, CreateView, UpdateView, DeleteView)
 from .models import (
@@ -477,7 +478,7 @@ class ProductDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             self.object.delete()
             return redirect(self.get_success_url())
         except:
-            return render(request, 'inventory/product_delete_error.html')
+            return render(request, 'inventory/protected_delete_error.html')
 
 
 class CustomerOrderCreate(LoginRequiredMixin, CreateView):
@@ -658,3 +659,85 @@ class ParStockRecordDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         else:
             return False
+
+
+class CustomerList(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    template_name = 'inventory/customers.html'
+    
+    def get_queryset(self):
+        product_ids = Product.objects.filter(user=self.request.user).values_list('pk', flat=True)
+        customer_order_ids = CustomerOrder.objects.filter(product__in=product_ids).values_list('customer', flat=True)
+        self.customer_list = Customer.objects.filter(pk__in=customer_order_ids)
+        return self.customer_list
+
+    def test_func(self):
+        if Product.objects.filter(user=self.kwargs['user']).first().user == self.request.user:
+            return True
+        else:
+            return False
+
+
+class CustomerDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Customer
+    template_name = 'inventory/customer_detail.html'
+
+    def test_func(self):
+        customer = self.get_object()
+        customer_order = CustomerOrder.objects.filter(product__user=self.request.user).first()
+        if customer_order.product.user == self.request.user:
+            return True
+        else:
+            return False
+
+
+class CustomerCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Customer
+    fields = ['name']
+
+    def form_valid(self, form):
+        form.instance.label = slugify(form.instance.name)
+        return super().form_valid(form)
+    
+    def test_func(self):
+        if Product.objects.filter(user=self.kwargs['user']).first().user == self.request.user:
+            return True
+        else:
+            return False
+    
+
+class CustomerUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Customer
+    fields = ['name', 'label']
+
+    def form_valid(self, form):
+        form.instance.label = slugify(form.instance.label)
+        return super().form_valid(form)
+
+    def test_func(self):
+        if Product.objects.filter(user=self.kwargs['user']).first().user == self.request.user:
+            return True
+        else:
+            return False
+
+
+class CustomerDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Customer
+
+    def get_success_url(self):
+        return reverse_lazy(
+        'inventory:my_customers', 
+        kwargs={'user': self.request.user})
+    
+    def test_func(self):
+        if Product.objects.filter(user=self.kwargs['user']).first().user == self.request.user:
+            return True
+        else:
+            return False
+        
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            self.object.delete()
+            return redirect(self.get_success_url())
+        except:
+            return render(request, 'inventory/protected_delete_error.html')
