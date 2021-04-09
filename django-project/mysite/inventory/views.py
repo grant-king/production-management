@@ -415,6 +415,7 @@ class PurchaseOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         else:
             return False
 
+
 class PurchaseOrderDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = PurchaseOrder
     
@@ -428,6 +429,7 @@ class PurchaseOrderDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         else:
             return False
+
 
 class ProductCreate(LoginRequiredMixin, CreateView):
     model = Product
@@ -476,3 +478,33 @@ class ProductDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return redirect(self.get_success_url())
         except:
             return render(request, 'inventory/product_delete_error.html')
+
+
+class CustomerOrderCreate(LoginRequiredMixin, CreateView):
+    model = CustomerOrder
+    fields = ['order_number', 'customer', 'product', 'date', 'quantity']
+
+
+class CustomerOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = CustomerOrder
+    fields = ['order_number', 'customer', 'product', 'date', 'quantity']
+
+    def test_func(self):
+        if self.get_object().product.user == self.request.user:
+            return True
+        else:
+            return False
+
+class CustomerOrderDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = CustomerOrder
+
+    def get_success_url(self):
+        return reverse_lazy(
+        'inventory:product_orders', 
+        kwargs={'product': self.get_object().product.label})
+    
+    def test_func(self):
+        if self.get_object().product.user == self.request.user:
+            return True
+        else:
+            return False

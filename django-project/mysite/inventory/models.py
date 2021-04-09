@@ -51,6 +51,9 @@ class CustomerOrder(models.Model):
     def __str__(self):
         return f'{self.order_number}: {self.customer.name[:5]}: {self.quantity} {self.product.name}'
 
+    def get_absolute_url(self):
+        return reverse('inventory:customer_order_detail', kwargs={'pk': self.pk})
+
 
 class InventoryRecord(models.Model):
     amount = models.IntegerField()

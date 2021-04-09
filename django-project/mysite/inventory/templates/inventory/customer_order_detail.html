@@ -3,6 +3,9 @@
     <h1>
         Customer Order {{ object.order_number }} Detail
     </h1>
+    <p>
+    <small><a href="{% url 'inventory:customer_order_update' object.pk %}">Edit this Customer Order</a></small>
+    </p>
     <table>
         <tr>
             <th>Order Number</th>
@@ -21,5 +24,5 @@
     </table>
     <br>
     <hr>
-    <a href="{% url 'inventory:index' %}">back to all inventory</a>
+    <a href="{% url 'inventory:product_orders' object.product.label %}">back to {{ object.product.name }} overview</a>
 {% endblock content %}
