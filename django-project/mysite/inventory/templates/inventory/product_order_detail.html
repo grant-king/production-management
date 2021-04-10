@@ -70,6 +70,7 @@
         </tr>
         {% endfor %}
     </table>
+    <a href="{% url 'inventory:purchase_order_create' product.label %}">Add a new Purchase Order</a><br>
     <br>
     <hr>
 
@@ -101,6 +102,7 @@
         </tr>
         {% endfor %}
     </table>
+    <a href="{% url 'inventory:customer_order_create' product.label %}">Add a new Customer Order</a>
     <br>
     <hr>
     {% if start_date %}

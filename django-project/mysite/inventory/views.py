@@ -49,7 +49,7 @@ def index(request):
         )}
 
     return render(request, 'inventory/index.html', context)
-    
+
 
 class ProductDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     template_name = 'inventory/product_detail.html'
@@ -419,7 +419,11 @@ class CustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
 class PurchaseOrderCreate(LoginRequiredMixin, CreateView):
     model = PurchaseOrder
-    fields = ['order_number', 'product', 'runs', 'run_quantity', 'date']
+    fields = ['order_number', 'runs', 'run_quantity', 'date']
+
+    def form_valid(self, form):
+        form.instance.product = Product.objects.get(label=self.kwargs['product'])
+        return super().form_valid(form)
 
 
 class PurchaseOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -504,7 +508,11 @@ class ProductDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class CustomerOrderCreate(LoginRequiredMixin, CreateView):
     model = CustomerOrder
-    fields = ['order_number', 'customer', 'product', 'date', 'quantity']
+    fields = ['order_number', 'customer', 'date', 'quantity']
+
+    def form_valid(self, form):
+        form.instance.product = Product.objects.get(label=self.kwargs['product'])
+        return super().form_valid(form)
 
 
 class CustomerOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):

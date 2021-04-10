@@ -33,7 +33,7 @@ app_name = 'inventory'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('customer_orders/new/', CustomerOrderCreate.as_view(), name='customer_order_create'),
+    path('customer_orders/<slug:product>/new/', CustomerOrderCreate.as_view(), name='customer_order_create'),
     path('customer_orders/product/<slug:product>/', ProductCustomerOrderList.as_view(), name='product_customer_orders'),
     path('customer_orders/product/<slug:product>/date/<yyyy:date>/', ProductCustomerOrderDateFilterList.as_view(), name='date_filter_product_customer_orders'),
     path('customer_orders/<int:pk>/', CustomerOrderDetail.as_view(), name='customer_order_detail'),
@@ -41,7 +41,7 @@ urlpatterns = [
     path('customer_orders/<int:pk>/delete/', CustomerOrderDelete.as_view(), name='customer_order_delete'),
     path('customer_orders/all/', CustomerOrderList.as_view(), name='all_customer_orders'),
     path('purchase_orders/product/<slug:product>/', ProductPurchaseOrderList.as_view(), name='product_purchase_orders'),
-    path('purchase_orders/new/', PurchaseOrderCreate.as_view(), name='purchase_order_create'),
+    path('purchase_orders/<slug:product>/new/', PurchaseOrderCreate.as_view(), name='purchase_order_create'),
     path('purchase_orders/<int:pk>/', PurchaseOrderDetail.as_view(), name='purchase_order_detail'),
     path('purchase_orders/<int:pk>/update/', PurchaseOrderUpdate.as_view(), name='purchase_order_update'),
     path('purchase_orders/<int:pk>/delete/', PurchaseOrderDelete.as_view(), name='purchase_order_delete'),
