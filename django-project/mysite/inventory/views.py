@@ -12,6 +12,7 @@ from .models import (
     InventoryRecord, ParStockRecord)
 from datetime import datetime
 from django.db.models import ProtectedError
+from django.db import IntegrityError
 
 @login_required
 def index(request):
@@ -48,44 +49,58 @@ def index(request):
         )}
 
     return render(request, 'inventory/index.html', context)
-
-@login_required
-def product_detail(request, product):
-    product = Product.objects.get(label=product)
-    related_customer_orders = CustomerOrder.objects.filter(product=product)
-    rco_sum = sum([customer_order.quantity for customer_order in related_customer_orders])
-    related_purchase_orders = PurchaseOrder.objects.filter(product=product)
-    rpo_sum = sum([purchase_order.total for purchase_order in related_purchase_orders])
-    try:
-        recent_inventory = InventoryRecord.objects.filter(product=item).order_by('-date').first().amount
-    except:
-        recent_inventory = 0
-    try:
-        recent_par_stock = ParStockRecord.objects.filter(product=item).order_by('-date').first().amount
-    except:
-        recent_par_stock = 0
-    calculated_inventory = recent_inventory + rpo_sum - rco_sum
-    stock_error = recent_inventory - recent_par_stock
-    context = {
-        'product': product,
-        'available': calculated_inventory,
-        'customer_orders': rco_sum,
-        'purchase_orders': rpo_sum,
-        'recent_inventory': recent_inventory,
-        'recent_par_stock': recent_par_stock,
-        'stock_error': stock_error,
-    }
     
-    return render(request, 'inventory/product_detail.html', context)
+
+class ProductDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    template_name = 'inventory/product_detail.html'
+    model = Product
+    query_pk_and_slug = True
+    slug_field = 'label'
+    slug_url_kwarg = 'product'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        self.product = self.get_object()
+        related_customer_orders = CustomerOrder.objects.filter(product=self.product)
+        rco_sum = sum([customer_order.quantity for customer_order in related_customer_orders])
+        related_purchase_orders = PurchaseOrder.objects.filter(product=self.product)
+        rpo_sum = sum([purchase_order.total for purchase_order in related_purchase_orders])
+        try:
+            recent_inventory = InventoryRecord.objects.filter(product=item).order_by('-date').first().amount
+        except:
+            recent_inventory = 0
+        try:
+            recent_par_stock = ParStockRecord.objects.filter(product=item).order_by('-date').first().amount
+        except:
+            recent_par_stock = 0
+        calculated_inventory = recent_inventory + rpo_sum - rco_sum
+        stock_error = recent_inventory - recent_par_stock
+        
+        context['product'] = self.product
+        context['available'] = calculated_inventory
+        context['customer_orders'] = rco_sum
+        context['purchase_orders'] = rpo_sum
+        context['recent_inventory'] = recent_inventory
+        context['recent_par_stock'] = recent_par_stock
+        context['stock_error'] = stock_error
+
+        return context
+
+    def test_func(self):
+        if self.get_object().user == self.request.user:
+            return True
+        else:
+            return False
 
 
 class ProductOrders(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     template_name = 'inventory/product_order_detail.html'
     model = Product
+    query_pk_and_slug = True
     slug_field = 'label'
     slug_url_kwarg = 'product'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
         self.product = self.get_object()
         self.related_customer_orders = CustomerOrder.objects.filter(product=self.product)
@@ -435,11 +450,16 @@ class PurchaseOrderDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class ProductCreate(LoginRequiredMixin, CreateView):
     model = Product
-    fields = ['name', 'label']
+    fields = ['name']
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        return super().form_valid(form)
+        try:
+            form.instance.label = slugify(form.instance.name)
+            return super().form_valid(form)
+        except :
+            form.instance.label = slugify(f'{form.instance.name}_{self.request.user.id}')
+            return super().form_valid(form)
 
 
 class ProductUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):

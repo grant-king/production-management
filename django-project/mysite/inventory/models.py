@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class Product(models.Model):
     name = models.CharField(max_length=40)
-    label = models.SlugField(max_length=40, null=True)
+    label = models.SlugField(max_length=40, null=True, unique=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
     def __str__(self):

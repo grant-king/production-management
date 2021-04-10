@@ -2,7 +2,7 @@ from django.urls import path, register_converter
 from . import views
 from inventory.views import (
     ProductCustomerOrderList, ProductPurchaseOrderList, PurchaseOrderList,
-    product_detail, CustomerCustomerOrderList, PurchaseOrderDetail, 
+    ProductDetail, CustomerCustomerOrderList, PurchaseOrderDetail, 
     CustomerOrderDetail, CustomerOrderList, PurchaseOrderDateFilterList,
     CustomerOrderDateFilterList, ProductCustomerOrderDateFilterList, 
     ProductOrders, ProductOrdersDateFilter, PurchaseOrderCreate, ProductCreate,
@@ -53,7 +53,7 @@ urlpatterns = [
     path('customers/<int:user>/<int:pk>/delete/', CustomerDelete.as_view(), name='customer_delete'),
     path('customers/<customer>/', CustomerCustomerOrderList.as_view(), name='customer_customer_orders'),
     path('products/new/', ProductCreate.as_view(), name='product_create'),
-    path('products/<slug:product>/', views.product_detail, name='product_detail'),
+    path('products/<slug:product>/', ProductDetail.as_view(), name='product_detail'),
     path('products/<slug:product>/update/', ProductUpdate.as_view(), name='product_update'),
     path('products/<slug:product>/delete/', ProductDelete.as_view(), name='product_delete'),
     path('productorders/<slug:product>/', ProductOrders.as_view(), name='product_orders'),
