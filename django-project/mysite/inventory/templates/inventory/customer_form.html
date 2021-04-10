@@ -23,7 +23,7 @@
     <br>
     <hr>
     {% if object %}
-    <small><a href="{% url 'inventory:customer_delete' user.pk object.pk %}">Delete this Customer</a></small>
+    <small><a href="{% url 'inventory:customer_delete' object.pk %}">Delete this Customer</a></small>
     {% endif %}
 </div>
 {% endblock content %}
