@@ -11,6 +11,7 @@ from .models import (
     CustomerOrder, PurchaseOrder, Product, Customer, 
     InventoryRecord, ParStockRecord)
 from datetime import datetime
+from django.db.models import ProtectedError
 
 @login_required
 def index(request):
@@ -665,13 +666,11 @@ class CustomerList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'inventory/customers.html'
     
     def get_queryset(self):
-        product_ids = Product.objects.filter(user=self.request.user).values_list('pk', flat=True)
-        customer_order_ids = CustomerOrder.objects.filter(product__in=product_ids).values_list('customer', flat=True)
-        self.customer_list = Customer.objects.filter(pk__in=customer_order_ids)
+        self.customer_list = Customer.objects.filter(user=self.request.user)
         return self.customer_list
 
     def test_func(self):
-        if Product.objects.filter(user=self.kwargs['user']).first().user == self.request.user:
+        if self.get_queryset().first().user == self.request.user:
             return True
         else:
             return False
@@ -683,26 +682,20 @@ class CustomerDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
     def test_func(self):
         customer = self.get_object()
-        customer_order = CustomerOrder.objects.filter(product__user=self.request.user).first()
-        if customer_order.product.user == self.request.user:
+        if customer.user == self.request.user:
             return True
         else:
             return False
 
 
-class CustomerCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class CustomerCreate(LoginRequiredMixin, CreateView):
     model = Customer
     fields = ['name']
 
     def form_valid(self, form):
         form.instance.label = slugify(form.instance.name)
+        form.instance.user = self.request.user
         return super().form_valid(form)
-    
-    def test_func(self):
-        if Product.objects.filter(user=self.kwargs['user']).first().user == self.request.user:
-            return True
-        else:
-            return False
     
 
 class CustomerUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -714,7 +707,7 @@ class CustomerUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return super().form_valid(form)
 
     def test_func(self):
-        if Product.objects.filter(user=self.kwargs['user']).first().user == self.request.user:
+        if self.get_object().user == self.request.user:
             return True
         else:
             return False
@@ -726,18 +719,17 @@ class CustomerDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy(
         'inventory:my_customers', 
-        kwargs={'user': self.request.user})
+        kwargs={'user': self.request.user.pk})
     
     def test_func(self):
-        if Product.objects.filter(user=self.kwargs['user']).first().user == self.request.user:
+        if self.get_object().user == self.request.user:
             return True
         else:
             return False
         
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
         try:
-            self.object.delete()
+            self.get_object().delete()
             return redirect(self.get_success_url())
-        except:
+        except ProtectedError:
             return render(request, 'inventory/protected_delete_error.html')
