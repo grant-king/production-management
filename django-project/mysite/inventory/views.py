@@ -17,6 +17,9 @@ from django.db import IntegrityError
 @login_required
 def index(request):
     product_list = Product.objects.filter(user=request.user)
+    has_customers = Customer.objects.filter(user=request.user)
+    has_purchase_orders = 0
+    has_customer_orders = 0
     calculated_inventories = []
     calculated_errors = []
     recent_inventories = []
@@ -25,8 +28,10 @@ def index(request):
     rco_sums = []
     for item in product_list:
         related_customer_orders = CustomerOrder.objects.filter(product=item)
+        has_customer_orders += related_customer_orders.count()
         rco_sum = sum([customer_order.quantity for customer_order in related_customer_orders])
         related_purchase_orders = PurchaseOrder.objects.filter(product=item)
+        has_purchase_orders += related_purchase_orders.count()
         rpo_sum = sum([purchase_order.total for purchase_order in related_purchase_orders])
         try:
             recent_inventory = InventoryRecord.objects.filter(product=item).order_by('-date').first().amount
@@ -46,7 +51,9 @@ def index(request):
     context = {'product_inventories': zip(
         product_list, calculated_inventories, rpo_sums, 
         rco_sums, recent_inventories, recent_par_stocks, calculated_errors
-        )}
+        ), 'has_customers': has_customers,
+        'has_customer_orders': has_customer_orders,
+        'has_purchase_orders': has_purchase_orders}
 
     return render(request, 'inventory/index.html', context)
 
@@ -307,7 +314,9 @@ class PurchaseOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
     def test_func(self):
-        if self.get_queryset().first().product.user == self.request.user:
+        if self.get_queryset().count() == 0:
+            return True
+        elif self.get_queryset().first().product.user == self.request.user:
             return True
         else:
             return False
@@ -411,7 +420,9 @@ class CustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
     def test_func(self):
-        if self.get_queryset().first().product.user == self.request.user:
+        if self.get_queryset().count() == 0:
+            return True
+        elif self.get_queryset().first().product.user == self.request.user:
             return True
         else:
             return False
@@ -747,9 +758,7 @@ class CustomerDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Customer
 
     def get_success_url(self):
-        return reverse_lazy(
-        'inventory:my_customers', 
-        kwargs={'user': self.request.user.pk})
+        return reverse_lazy('inventory:my_customers')
     
     def test_func(self):
         if self.get_object().user == self.request.user:

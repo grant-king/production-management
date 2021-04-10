@@ -29,9 +29,17 @@
     <div>
     <br>
     <hr>
+    {% if has_purchase_orders %}
     <a href="{% url 'inventory:all_purchase_orders' %}">My Purchase Orders</a><br>
+    {% endif %}
+    {% if has_customer_orders %}
     <a href="{% url 'inventory:all_customer_orders' %}">My Customer Orders</a><br>
-    <a href="{% url 'inventory:my_customers' request.user.pk %}">My Customers</a><br>
+    {% endif %}
+    {% if has_customers %}
+    <a href="{% url 'inventory:my_customers' %}">My Customers</a><br>
+    {% else %}
+    <a href="{% url 'inventory:customer_create' %}">Add your first Customer</a>
+    {% endif %}
     </div>
     <div>
     <br>
