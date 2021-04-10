@@ -698,7 +698,9 @@ class CustomerList(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return self.customer_list
 
     def test_func(self):
-        if self.get_queryset().first().user == self.request.user:
+        if self.get_queryset().count() == 0:
+            return True
+        elif self.get_queryset().first().user == self.request.user:
             return True
         else:
             return False
