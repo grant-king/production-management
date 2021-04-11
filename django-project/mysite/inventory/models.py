@@ -4,8 +4,8 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 class Product(models.Model):
-    name = models.CharField(max_length=40)
-    label = models.SlugField(max_length=40, null=True, unique=True)
+    name = models.CharField(max_length=50)
+    label = models.SlugField(max_length=50, null=True, unique=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
     def __str__(self):
@@ -16,7 +16,7 @@ class Product(models.Model):
 
 
 class PurchaseOrder(models.Model):
-    order_number = models.CharField(max_length=10)
+    order_number = models.CharField(max_length=25)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     runs = models.FloatField()
     run_quantity = models.IntegerField()
@@ -34,8 +34,8 @@ class PurchaseOrder(models.Model):
 
 
 class Customer(models.Model):
-    name = models.CharField(max_length=40)
-    label = models.SlugField(max_length=40, null=True)
+    name = models.CharField(max_length=50)
+    label = models.SlugField(max_length=50, null=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
     def __str__(self):
@@ -46,7 +46,7 @@ class Customer(models.Model):
 
 
 class CustomerOrder(models.Model):
-    order_number = models.CharField(max_length=10)
+    order_number = models.CharField(max_length=25)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     date = models.DateField()
