@@ -282,9 +282,12 @@ class CustomerCustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListVie
         return context
 
     def test_func(self):
-        if self.get_queryset().first().product.user == self.request.user:
-            return True
-        else:
+        try:
+            if self.get_queryset().first().customer.user == self.request.user:
+                return True
+            else:
+                return False
+        except AttributeError:
             return False
 
 
@@ -479,7 +482,7 @@ class ProductCreate(LoginRequiredMixin, CreateView):
         try:
             form.instance.label = slugify(form.instance.name)
             return super().form_valid(form)
-        except :
+        except IntegrityError:
             form.instance.label = slugify(f'{form.instance.name}_{self.request.user.id}')
             return super().form_valid(form)
 
@@ -757,9 +760,13 @@ class CustomerCreate(LoginRequiredMixin, CreateView):
     fields = ['name']
 
     def form_valid(self, form):
-        form.instance.label = slugify(form.instance.name)
         form.instance.user = self.request.user
-        return super().form_valid(form)
+        try:
+            form.instance.label = slugify(form.instance.name)
+            return super().form_valid(form)
+        except IntegrityError:
+            form.instance.label = slugify(f'{form.instance.name}_{self.request.user.id}')
+            return super().form_valid(form)
     
 
 class CustomerUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
