@@ -29,5 +29,6 @@
     </table>
     <br>
     <hr>
+    <a href="{% url 'inventory:product_orders' product.label %}">back to {{ product.name }} overview</a><br>
     <a href="{% url 'inventory:index' %}">back to all inventory</a>
 {% endblock content %}

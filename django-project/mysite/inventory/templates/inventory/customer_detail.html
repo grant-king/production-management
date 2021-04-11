@@ -11,7 +11,7 @@
             <th>Customer</th>
         </tr>
         <tr>
-            <td>{{ object.name }}</td>
+            <td><a href="{% url 'inventory:customer_customer_orders' object.label %}">{{ object.name }}</a></td>
         </tr>
     </table>
     <br>

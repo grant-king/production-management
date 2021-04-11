@@ -12,8 +12,8 @@
         </tr>
         {% for related_customer_order in object_list %}
         <tr>
-            <td>{{ related_customer_order.order_number }}</td>
-            <td>{{ related_customer_order.product.name }}</td>
+            <td><a href="{% url 'inventory:customer_order_detail' related_customer_order.pk %}">{{ related_customer_order.order_number }}</a></td>
+            <td><a href="{% url 'inventory:product_orders' related_customer_order.product.label %}">{{ related_customer_order.product.name }}</a></td>
             <td>{{ related_customer_order.date }}</td>
             <td>{{ related_customer_order.quantity }}</td>
         </tr>
@@ -21,5 +21,6 @@
     </table>
     <br>
     <hr>
+    <a href="{% url 'inventory:my_customers' %}">back to My Customers</a><br>
     <a href="{% url 'inventory:index' %}">back to all inventory</a>
 {% endblock content %}
