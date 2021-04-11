@@ -1,7 +1,7 @@
 {% extends "inventory/base.html" %}
 {% block content %}
     <h1>
-        Inventory Record {{ object }} Detail
+        Beginning of Month Inventory Record {{ object }} Detail
     </h1>
     <p>
     <small><a href="{% url 'inventory:inventory_record_update' object.product.label object.pk %}">Edit this Inventory Record</a></small>

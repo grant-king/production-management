@@ -6,9 +6,9 @@
         {% csrf_token %}
         <fieldset>
             {% if object %}
-            <legend>Update this Inventory Record</legend>
+            <legend>Update this Beginning of Month Inventory Record</legend>
             {% else %}
-            <legend>Create a new Inventory Record</legend>
+            <legend>Create a new Beginning of Month Inventory Record</legend>
             {% endif %}
             {{ form|crispy }}
         </fieldset>
