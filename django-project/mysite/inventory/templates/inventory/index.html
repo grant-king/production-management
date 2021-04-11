@@ -6,12 +6,12 @@
     <table>
         <tr>
             <th>Product</th>
-            <th>Available Product<p>(inventory + PO's - Customer Orders )</p></th>
+            <th>Available Product<p>(inventory + PO's - Customer Orders)</p></th>
             <th>Factory PO's</th>
             <th>Customer Orders</th>
             <th>BOM Inventory</th>
             <th>Par Stock</th>
-            <th>Stock Error</th>
+            <th>Stock Error<p>(Available - Par Stock)</p></th>
         </tr>
         {% for product, available, purchase_orders, customer_orders, inventory, par_stock, stock_error in product_inventories %}
         <tr>
@@ -19,9 +19,9 @@
             <td>{{ available }}</a></td>
             <td>{{ purchase_orders }}</td>
             <td>{{ customer_orders }}</td>
-            <td>{{inventory}}</td>
-            <td>{{par_stock}}</td>
-            <td>{{stock_error}}</td>
+            <td>{{ inventory }}</td>
+            <td>{{ par_stock }}</td>
+            <td>{{ stock_error }}</td>
         </tr>
         {% endfor %}
     </table>

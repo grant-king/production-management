@@ -43,8 +43,9 @@ def index(request):
             recent_par_stock = 0
         recent_inventories.append(recent_inventory)
         recent_par_stocks.append(recent_par_stock)
-        calculated_inventories.append(recent_inventory + rpo_sum - rco_sum)
-        calculated_errors.append(recent_inventory - recent_par_stock)
+        available_product = recent_inventory + rpo_sum - rco_sum
+        calculated_inventories.append(available_product)
+        calculated_errors.append(available_product - recent_par_stock)
         rpo_sums.append(rpo_sum)
         rco_sums.append(rco_sum)
 
@@ -73,15 +74,15 @@ class ProductDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         related_purchase_orders = PurchaseOrder.objects.filter(product=self.product)
         rpo_sum = sum([purchase_order.total for purchase_order in related_purchase_orders])
         try:
-            recent_inventory = InventoryRecord.objects.filter(product=item).order_by('-date').first().amount
+            recent_inventory = InventoryRecord.objects.filter(product=self.product).order_by('-date').first().amount
         except:
             recent_inventory = 0
         try:
-            recent_par_stock = ParStockRecord.objects.filter(product=item).order_by('-date').first().amount
+            recent_par_stock = ParStockRecord.objects.filter(product=self.product).order_by('-date').first().amount
         except:
             recent_par_stock = 0
         calculated_inventory = recent_inventory + rpo_sum - rco_sum
-        stock_error = recent_inventory - recent_par_stock
+        stock_error = calculated_inventory - recent_par_stock
         
         context['product'] = self.product
         context['available'] = calculated_inventory
@@ -123,7 +124,7 @@ class ProductOrders(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         rco_sum = sum([customer_order.quantity for customer_order in self.related_customer_orders])
         rpo_sum = sum([purchase_order.total for purchase_order in self.related_purchase_orders])
         calculated_inventory = self.recent_inventory_record + rpo_sum - rco_sum
-        stock_error = self.recent_inventory_record - self.recent_par_stock_record
+        stock_error = calculated_inventory - self.recent_par_stock_record
         
         context['product'] = self.product
         context['available'] = calculated_inventory
