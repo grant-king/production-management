@@ -447,6 +447,13 @@ class PurchaseOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         else:
             return False
 
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        form = super(PurchaseOrderUpdate, self).get_form()
+        form.fields['product'].queryset = Product.objects.filter(user=self.request.user)
+        return form
+
 
 class PurchaseOrderDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = PurchaseOrder
@@ -525,6 +532,13 @@ class CustomerOrderCreate(LoginRequiredMixin, CreateView):
         form.instance.product = Product.objects.get(label=self.kwargs['product'])
         return super().form_valid(form)
 
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        form = super(CustomerOrderCreate, self).get_form()
+        form.fields['customer'].queryset = Customer.objects.filter(user=self.request.user)
+        return form
+
 
 class CustomerOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = CustomerOrder
@@ -535,6 +549,15 @@ class CustomerOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             return True
         else:
             return False
+
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        form = super(CustomerOrderUpdate, self).get_form()
+        form.fields['customer'].queryset = Customer.objects.filter(user=self.request.user)
+        form.fields['product'].queryset = Product.objects.filter(user=self.request.user)
+        return form
+
 
 class CustomerOrderDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = CustomerOrder
