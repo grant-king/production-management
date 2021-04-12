@@ -436,13 +436,20 @@ class CustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
             return False
 
 
-class PurchaseOrderCreate(LoginRequiredMixin, CreateView):
+class PurchaseOrderCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = PurchaseOrder
     fields = ['order_number', 'runs', 'run_quantity', 'date']
 
     def form_valid(self, form):
         form.instance.product = Product.objects.get(label=self.kwargs['product'])
         return super().form_valid(form)
+
+    def test_func(self):
+        product = Product.objects.get(label=self.kwargs['product'])
+        if product.user == self.request.user:
+            return True
+        else:
+            return False
 
 
 class PurchaseOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -532,10 +539,10 @@ class ProductDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return render(request, 'inventory/protected_delete_error.html')
 
 
-class CustomerOrderCreate(LoginRequiredMixin, CreateView):
+class CustomerOrderCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = CustomerOrder
     fields = ['order_number', 'customer', 'date', 'quantity']
-
+        
     def form_valid(self, form):
         form.instance.product = Product.objects.get(label=self.kwargs['product'])
         return super().form_valid(form)
@@ -546,6 +553,13 @@ class CustomerOrderCreate(LoginRequiredMixin, CreateView):
         form = super(CustomerOrderCreate, self).get_form()
         form.fields['customer'].queryset = Customer.objects.filter(user=self.request.user)
         return form
+
+    def test_func(self):
+        product = Product.objects.get(label=self.kwargs['product'])
+        if product.user == self.request.user:
+            return True
+        else:
+            return False
 
 
 class CustomerOrderUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
