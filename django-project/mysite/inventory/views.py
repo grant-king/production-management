@@ -20,6 +20,7 @@ def index(request):
     has_customers = Customer.objects.filter(user=request.user)
     has_purchase_orders = 0
     has_customer_orders = 0
+    has_products = product_list.count()
     calculated_inventories = []
     calculated_errors = []
     recent_inventories = []
@@ -54,7 +55,8 @@ def index(request):
         rco_sums, recent_inventories, recent_par_stocks, calculated_errors
         ), 'has_customers': has_customers,
         'has_customer_orders': has_customer_orders,
-        'has_purchase_orders': has_purchase_orders}
+        'has_purchase_orders': has_purchase_orders,
+        'has_products': has_products}
 
     return render(request, 'inventory/index.html', context)
 
@@ -135,6 +137,9 @@ class ProductOrders(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context['stock_error'] = stock_error
         context['related_customer_orders'] = self.related_customer_orders
         context['related_purchase_orders'] = self.related_purchase_orders
+        context['has_customers'] = Customer.objects.filter(user=self.request.user).count()
+        context['has_purchase_orders'] = self.related_purchase_orders.count()
+        context['has_customer_orders'] = self.related_customer_orders.count()
 
         return context
 
@@ -176,7 +181,7 @@ class ProductOrdersDateFilter(LoginRequiredMixin, UserPassesTestMixin, DetailVie
         rpo_sum = sum([purchase_order.total for purchase_order in self.related_purchase_orders])
         calculated_inventory = self.recent_inventory_record + rpo_sum - rco_sum
         stock_error = self.recent_inventory_record - self.recent_par_stock_record
-      
+
         context['product'] = self.product
         context['available'] = calculated_inventory
         context['customer_orders_total'] = rco_sum
@@ -193,6 +198,9 @@ class ProductOrdersDateFilter(LoginRequiredMixin, UserPassesTestMixin, DetailVie
             context['end_date'] = end_date.date()
         except:
             context['end_date'] = end_date
+        context['has_customers'] = Customer.objects.filter(user=self.request.user).count()
+        context['has_purchse_orders'] = self.related_purchase_orders.count()
+        context['has_customer_orders'] = self.related_customer_orders.count()
 
         return context
 
@@ -274,7 +282,7 @@ class CustomerCustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListVie
         self.customer = get_object_or_404(Customer, label=self.kwargs['customer'])
         return CustomerOrder.objects.filter(
             customer=self.customer, product__user=self.request.user
-            ).order_by('-date')
+            ).order_by('-date', 'product__name')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -393,7 +401,7 @@ class CustomerOrderDateFilterList(LoginRequiredMixin, UserPassesTestMixin, ListV
             self.end_date_set = False
         return CustomerOrder.objects.filter(
             product__user=self.request.user,
-            date__range=[self.start_date, self.end_date]).order_by('-date')
+            date__range=[self.start_date, self.end_date]).order_by('-date', 'customer__name', 'product__name')
     
     def test_func(self):
         if self.get_queryset().first().product.user == self.request.user:
@@ -419,7 +427,7 @@ class CustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     ordering = ['date', 'product']
 
     def get_queryset(self):
-        return CustomerOrder.objects.filter(product__user=self.request.user).order_by('-date')
+        return CustomerOrder.objects.filter(product__user=self.request.user).order_by('-date', 'customer__name', 'product__name')
 
     def get_context_data(self, **kwargs):
         co_count = self.get_queryset().count()
@@ -489,19 +497,27 @@ class ProductCreate(LoginRequiredMixin, CreateView):
     model = Product
     fields = ['name']
 
+    def get_success_url(self):
+        return reverse_lazy(
+        'inventory:product_orders', 
+        kwargs={'product': self.label})
+
     def form_valid(self, form):
         form.instance.user = self.request.user
         try:
             form.instance.label = slugify(form.instance.name)
+            self.label = form.instance.label
             return super().form_valid(form)
         except IntegrityError:
-            form.instance.label = slugify(f'{form.instance.name}_{self.request.user.id}')
+            extension = f'{self.request.user.id}{Product.objects.filter(user=self.request.user).count()}'
+            form.instance.label = slugify(f'{form.instance.name}_{extension}')
+            self.label = form.instance.label
             return super().form_valid(form)
 
 
 class ProductUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Product
-    fields = ['name', 'label']
+    fields = ['name']
     slug_field = 'label'
     slug_url_kwarg = 'product'
 
@@ -541,7 +557,7 @@ class ProductDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class CustomerOrderCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = CustomerOrder
-    fields = ['order_number', 'customer', 'date', 'quantity']
+    fields = ['order_number', 'customer', 'quantity', 'date']
         
     def form_valid(self, form):
         form.instance.product = Product.objects.get(label=self.kwargs['product'])
@@ -790,7 +806,7 @@ class CustomerCreate(LoginRequiredMixin, CreateView):
 
 class CustomerUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Customer
-    fields = ['name', 'label']
+    fields = ['name']
 
     def form_valid(self, form):
         form.instance.label = slugify(form.instance.label)

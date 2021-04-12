@@ -20,7 +20,7 @@ class PurchaseOrder(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     runs = models.FloatField()
     run_quantity = models.IntegerField()
-    date = models.DateField()
+    date = models.DateField(default=timezone.now)
 
     def __str__(self):
         return f'{self.order_number}: {self.product.name}: {self.total}'
@@ -49,7 +49,7 @@ class CustomerOrder(models.Model):
     order_number = models.CharField(max_length=25)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
-    date = models.DateField()
+    date = models.DateField(default=timezone.now)
     quantity = models.IntegerField()
 
     def __str__(self):

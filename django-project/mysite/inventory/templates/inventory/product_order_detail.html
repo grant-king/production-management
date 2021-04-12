@@ -28,18 +28,20 @@
     </table>
     <br>
     <hr>
+    {% if has_customer_orders or has_purchase_orders %}
     {% if start_date %}
-        <h2>Date range: {{ start_date }} to {{ end_date }}</h2>
-        {% if end_date_unset %}
-            <p>click another date to set the date filter endpoint</p>
-        {% else %}
-            <a href="{% url 'inventory:product_orders' product.label %}">back to all orders for {{ product.name }}</a>
-        {% endif %}
+    <h2>Date range: {{ start_date }} to {{ end_date }}</h2>
+    {% if end_date_unset %}
+    <p>click another date to set the date filter endpoint</p>
     {% else %}
-        <h2>All related orders</h2>
-        <p>click a date to set the date filter starting point</p>
+    <a href="{% url 'inventory:product_orders' product.label %}">back to all orders for {{ product.name }}</a>
+    {% endif %}
+    {% else %}
+    <h2>All related orders</h2>
+    <p>click a date to set the date filter starting point</p>
     {% endif %}    
-        
+    {% endif %}
+    
     <hr>
     <h3>
         {% if start_date %}
@@ -49,6 +51,7 @@
         {% endif %}
     </h3>
     <a href="{% url 'inventory:purchase_order_create' product.label %}">Add a new Purchase Order</a><br>
+    {% if has_purchase_orders %}
     <table>
         <tr>
             <th>Order Number</th>
@@ -71,6 +74,7 @@
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
     <br>
     <hr>
 
@@ -81,7 +85,12 @@
         Customer Orders related to {{ product.name }}
         {% endif %}    
     </h3>
+    {% if has_customers %}
     <a href="{% url 'inventory:customer_order_create' product.label %}">Add a new Customer Order</a>
+    {% else %}
+    <a href="{% url 'inventory:customer_create' %}">Add your first Customer</a>
+    {% endif %}
+    {% if has_customer_orders %}
     <table>
         <tr>
             <th>Order Number</th>
@@ -102,6 +111,7 @@
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
     <br>
     <hr>
     {% if start_date %}

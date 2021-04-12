@@ -24,6 +24,9 @@
     <hr>
     {% if object %}
     <small><a href="{% url 'inventory:customer_order_delete' object.pk %}">Delete this Customer Order</a></small>
+    {% else %}
+    <p>Don't see the Customer you want?</p>
+    <a href="{% url 'inventory:customer_create' %}">Add a new Customer</a>
     {% endif %}
 </div>
 {% endblock content %}
