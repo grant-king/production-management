@@ -291,6 +291,10 @@ class CustomerCustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListVie
         except AttributeError:
             return False
 
+    def handle_no_permission(self):
+        context = {'customer': Customer.objects.get(label=self.kwargs['customer'])}
+        return render(self.request, 'inventory/error_no_customer_customerorders.html', context=context)
+
 
 class PurchaseOrderDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = PurchaseOrder
