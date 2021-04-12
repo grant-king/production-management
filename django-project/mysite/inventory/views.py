@@ -111,8 +111,8 @@ class ProductOrders(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
         self.product = self.get_object()
-        self.related_customer_orders = CustomerOrder.objects.filter(product=self.product)
-        self.related_purchase_orders = PurchaseOrder.objects.filter(product=self.product)
+        self.related_customer_orders = CustomerOrder.objects.filter(product=self.product).order_by('-date')
+        self.related_purchase_orders = PurchaseOrder.objects.filter(product=self.product).order_by('-date')
         try:
             self.recent_inventory_record = InventoryRecord.objects.filter(product=self.product).order_by('-date').first().amount
         except:
@@ -162,8 +162,8 @@ class ProductOrdersDateFilter(LoginRequiredMixin, UserPassesTestMixin, DetailVie
             context['end_date_unset'] = True
         
         self.product = self.get_object()
-        self.related_customer_orders = CustomerOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('date')
-        self.related_purchase_orders = PurchaseOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('date')
+        self.related_customer_orders = CustomerOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('-date')
+        self.related_purchase_orders = PurchaseOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('-date')
         try:
             self.recent_inventory_record = InventoryRecord.objects.filter(product=self.product).order_by('-date').first().amount
         except:
@@ -208,7 +208,7 @@ class ProductCustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView
     
     def get_queryset(self):
         self.product = get_object_or_404(Product, label=self.kwargs['product'])
-        return CustomerOrder.objects.filter(product=self.product).order_by('date')
+        return CustomerOrder.objects.filter(product=self.product).order_by('-date')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -230,7 +230,7 @@ class ProductCustomerOrderDateFilterList(LoginRequiredMixin, UserPassesTestMixin
         start_date = self.kwargs['date']
         end_date = datetime.now()
         self.product = Product.objects.get(label=self.kwargs['product'])
-        return CustomerOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('date')
+        return CustomerOrder.objects.filter(product=self.product, date__range=[start_date, end_date]).order_by('-date')
 
     def get_context_data(self, **kwargs):
         co_count = self.get_queryset().count()
@@ -252,7 +252,7 @@ class ProductPurchaseOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView
     
     def get_queryset(self):
         self.product = get_object_or_404(Product, label=self.kwargs['product'])
-        return PurchaseOrder.objects.filter(product=self.product).order_by('date')
+        return PurchaseOrder.objects.filter(product=self.product).order_by('-date')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -274,7 +274,7 @@ class CustomerCustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListVie
         self.customer = get_object_or_404(Customer, label=self.kwargs['customer'])
         return CustomerOrder.objects.filter(
             customer=self.customer, product__user=self.request.user
-            ).order_by('date')
+            ).order_by('-date')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -313,7 +313,7 @@ class PurchaseOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     ordering = ['date']
 
     def get_queryset(self):
-        return PurchaseOrder.objects.filter(product__user=self.request.user)
+        return PurchaseOrder.objects.filter(product__user=self.request.user).order_by('-date')
 
     def get_context_data(self, **kwargs):
         po_count = self.get_queryset().count()
@@ -357,7 +357,7 @@ class PurchaseOrderDateFilterList(LoginRequiredMixin, UserPassesTestMixin, ListV
             self.end_date_set = False
         return PurchaseOrder.objects.filter(
             product__user=self.request.user,
-            date__range=[self.start_date, self.end_date]).order_by('date')
+            date__range=[self.start_date, self.end_date]).order_by('-date')
 
     def test_func(self):
         if self.get_queryset().first().product.user == self.request.user:
@@ -393,7 +393,7 @@ class CustomerOrderDateFilterList(LoginRequiredMixin, UserPassesTestMixin, ListV
             self.end_date_set = False
         return CustomerOrder.objects.filter(
             product__user=self.request.user,
-            date__range=[self.start_date, self.end_date]).order_by('date')
+            date__range=[self.start_date, self.end_date]).order_by('-date')
     
     def test_func(self):
         if self.get_queryset().first().product.user == self.request.user:
@@ -419,7 +419,7 @@ class CustomerOrderList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     ordering = ['date', 'product']
 
     def get_queryset(self):
-        return CustomerOrder.objects.filter(product__user=self.request.user)
+        return CustomerOrder.objects.filter(product__user=self.request.user).order_by('-date')
 
     def get_context_data(self, **kwargs):
         co_count = self.get_queryset().count()
