@@ -48,6 +48,7 @@
         Purchase Orders related to {{ product.name }}
         {% endif %}
     </h3>
+    <a href="{% url 'inventory:purchase_order_create' product.label %}">Add a new Purchase Order</a><br>
     <table>
         <tr>
             <th>Order Number</th>
@@ -70,7 +71,6 @@
         </tr>
         {% endfor %}
     </table>
-    <a href="{% url 'inventory:purchase_order_create' product.label %}">Add a new Purchase Order</a><br>
     <br>
     <hr>
 
@@ -79,9 +79,9 @@
         {{ co_filter_count }} Customer Orders for {{ product.name }} for this date range
         {% else %}
         Customer Orders related to {{ product.name }}
-        {% endif %}
-        
+        {% endif %}    
     </h3>
+    <a href="{% url 'inventory:customer_order_create' product.label %}">Add a new Customer Order</a>
     <table>
         <tr>
             <th>Order Number</th>
@@ -102,7 +102,6 @@
         </tr>
         {% endfor %}
     </table>
-    <a href="{% url 'inventory:customer_order_create' product.label %}">Add a new Customer Order</a>
     <br>
     <hr>
     {% if start_date %}
