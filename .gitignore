@@ -2,3 +2,5 @@
 *.pyc
 django-project/mysite/media/*
 django-project/mysite/private_config.json
+django-project/mysite/static/*
+
