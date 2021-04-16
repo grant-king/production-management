@@ -12,6 +12,7 @@
 # below:
 .git
 .gitignore
+#! include django-project/mysite/static/*
 
 # Python pycache:
 __pycache__/

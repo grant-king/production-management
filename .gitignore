@@ -3,4 +3,4 @@
 django-project/mysite/media/*
 django-project/mysite/private_config.json
 django-project/mysite/static/*
-
+django-project/mysite/storage_credentials.json
