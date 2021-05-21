@@ -199,7 +199,7 @@ class ProductOrdersDateFilter(LoginRequiredMixin, UserPassesTestMixin, DetailVie
         except:
             context['end_date'] = end_date
         context['has_customers'] = Customer.objects.filter(user=self.request.user).count()
-        context['has_purchse_orders'] = self.related_purchase_orders.count()
+        context['has_purchase_orders'] = self.related_purchase_orders.count()
         context['has_customer_orders'] = self.related_customer_orders.count()
 
         return context
