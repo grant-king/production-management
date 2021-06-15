@@ -4,3 +4,6 @@ django-project/mysite/media/*
 django-project/mysite/private_config.json
 django-project/mysite/static/*
 django-project/mysite/storage_credentials.json
+data-tools/sales.csv
+data-tools/locations.csv
+data-tools/.vscode/*
