@@ -32,11 +32,24 @@
 {{ message }}
 {% endfor %}
 {% endif %}
-
+{% if user.is_authenticated %}
 <div>
-    <a href="{% url 'inventory:index' %}">inventory home</a>
+    <a href="{% url 'inventory:index' %}">| Inventory Home | </a>
+    <a href="{% url 'reports:index' %}">Reports Home | </a>
 </div>
-
+<div>
+    <a href="{% url 'users:logout' %}">| log out | </a>
+    <a href="{% url 'users:profile' %}">user profile | </a>
+    {% else %}
+    <a href="{% url 'users:login' %}">log in | </a>
+    {% endif %}
+</div>
+<hr>
+<br>
+{% block appnav %}
+{% endblock appnav %}
+<hr>
+<br>
 {% block content %}
 {% endblock content %}
 

@@ -1,4 +1,19 @@
 {% extends "inventory/base.html" %}
+{% block appnav %}
+<div>
+{% if has_purchase_orders %}
+<a href="{% url 'inventory:all_purchase_orders' %}">My Purchase Orders</a><br>
+{% endif %}
+{% if has_customer_orders %}
+<a href="{% url 'inventory:all_customer_orders' %}">My Customer Orders</a><br>
+{% endif %}
+{% if has_customers %}
+<a href="{% url 'inventory:my_customers' %}">My Customers</a><br>
+{% else %}
+<a href="{% url 'inventory:customer_create' %}">Add your first Customer</a>
+{% endif %}
+</div>
+{% endblock appnav %}
 {% block content %}
     <h1>
         Product Inventory
@@ -34,27 +49,7 @@
     <div>
     <br>
     <hr>
-    {% if has_purchase_orders %}
-    <a href="{% url 'inventory:all_purchase_orders' %}">My Purchase Orders</a><br>
-    {% endif %}
-    {% if has_customer_orders %}
-    <a href="{% url 'inventory:all_customer_orders' %}">My Customer Orders</a><br>
-    {% endif %}
-    {% if has_customers %}
-    <a href="{% url 'inventory:my_customers' %}">My Customers</a><br>
-    {% else %}
-    <a href="{% url 'inventory:customer_create' %}">Add your first Customer</a>
-    {% endif %}
-    </div>
-    <div>
-    <br>
-    <hr>
-    {% if user.is_authenticated %}
-    <a href="{% url 'users:logout' %}">| log out | </a>
-    <a href="{% url 'users:profile' %}">user profile | </a>
-    {% else %}
-    <a href="{% url 'users:login' %}">log in | </a>
-    {% endif %}
+    
     </div>
 
 {% endblock content %}
