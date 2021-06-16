@@ -7,3 +7,5 @@ django-project/mysite/storage_credentials.json
 data-tools/sales.csv
 data-tools/locations.csv
 data-tools/.vscode/*
+data-tools/*.csv
+.vscode/*
