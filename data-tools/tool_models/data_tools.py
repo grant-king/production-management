@@ -10,7 +10,7 @@ class LocationData:
         self._tidy_data()
         self._set_all_totals(
             {'metro': 'Market-Metro', 'region': 'Region'})
-        self.region_data = self.get_region_data()
+        self.location_relations = self._get_relational_data()
         self.totals_reports_graphs = {}
         
     def _add_case_totals(self):
@@ -46,10 +46,12 @@ class LocationData:
         plot.set_xticklabels(x_labels)
         self.totals_reports_graphs[table_name] = plt
 
-    def get_region_data(self):
-        region_data = self.locations_df.loc[:, ['Company + Location', 'Region', 'Market-Metro']]
-        region_data.rename(columns={'Company + Location': 'Locations'}, inplace=True)
-        return region_data
+    def _get_relational_data(self):
+        # return data that can be used to determine relationships between 
+        # a location's name, region, and market-metro
+        location_relations = self.locations_df.loc[:, ['Company + Location', 'Region', 'Market-Metro']]
+        location_relations.rename(columns={'Company + Location': 'Locations'}, inplace=True)
+        return location_relations
 
     @property
     def totals_tables_names(self):
@@ -69,3 +71,67 @@ class LocationData:
                 self._set_report_graph(name)
             #show specified plot
             self.totals_reports_graphs[name].show()
+
+
+class SalesData:
+    def __init__(self, csv_file):
+        self.sales_df = pd.read_csv(csv_file)
+        self._tidy_data()
+        self.sales_totals = self._get_sales_totals()
+        
+    def _tidy_data(self):
+        self.sales_df.dropna(subset=['Units Sold'], inplace=True)
+        self.sales_df[self.sales_df['Units Sold'] != 0]
+        self.sales_df = self.sales_df.loc[:, ['Locations', 'Date', 'Product', 'Units Sold']]
+
+    def _get_sales_totals(self):
+        sales_totals = self.sales_df.groupby(['Locations', 'Date', 'Product']).sum()
+        sales_totals = sales_totals.sort_values(['Units Sold'])
+        return sales_totals
+        
+
+class LocationSales:
+    def __init__(self, location_relations, sales_data):
+        self.location_relations = location_relations
+        self.sales_totals = sales_data
+        self.location_sales = self._get_combined()
+
+    def _get_combined(self):
+        combined = pd.merge(self.location_relations, self.sales_totals)
+        combined['Date'] = pd.to_datetime(combined['Date'])
+        return combined
+
+    def date_filter_sales(self, date_range):
+        date_mask = (self.location_sales['Date'] > date_range[0]) & (self.location_sales['Date'] <= date_range[1])
+        filtered_sales = self.location_sales.loc[date_mask]
+        self.current_date_range = date_range
+        return filtered_sales
+
+    def aggregate_sales(self, location_sales, group_by=['Region', 'Product']):
+        aggregate_functions = {'Units Sold': 'sum'}
+        grouped_totals = location_sales.groupby(group_by, as_index=False)
+        grouped_totals = grouped_totals.agg(aggregate_functions)
+        grouped_totals = grouped_totals.sort_values('Units Sold', ascending=False)
+        self.current_group_by = group_by
+        return grouped_totals
+
+    def get_date_filter_aggregated_sales(self, date_range, group_by):
+        filtered_sales = self.date_filter_sales(date_range)
+        aggregated_sales = self.aggregate_sales(
+            filtered_sales, group_by=group_by)
+
+        return aggregated_sales
+
+    def date_filter_grouped_product_sales_plot(self, aggregated_sales):
+        #display a plot of the sales with the current group by settings
+        sns.set()
+        plt.figure()
+        plt.xticks(rotation=60)
+        palette = sns.color_palette("rainbow_r", len(aggregated_sales[self.current_group_by[1]].unique()))
+        plot = sns.barplot(x=self.current_group_by[0], y='Units Sold', hue=self.current_group_by[1], data=aggregated_sales, ci=None, palette=palette)
+        plot.set_title(f'Unit Sales by {self.current_group_by[0]} and {self.current_group_by[1]} from {self.current_date_range[0]} to {self.current_date_range[1]}')
+        plot.set_ylabel('Unit Sales')
+        plot.set_xlabel(f'{self.current_group_by[0]} by {self.current_group_by[1]}')
+        plt.legend(loc=1, fontsize='18', title=f'{self.current_group_by[1]} Types')
+        plt.tight_layout()
+        plt.show()
