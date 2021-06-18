@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import calendar
 
 class LocationData:
     def __init__(self, csv_file):
@@ -133,5 +134,58 @@ class LocationSales:
         plot.set_ylabel('Unit Sales')
         plot.set_xlabel(f'{self.current_group_by[0]} by {self.current_group_by[1]}')
         plt.legend(loc=1, fontsize='18', title=f'{self.current_group_by[1]} Types')
+        plt.tight_layout()
+        plt.show()
+
+
+class SalesTimeSeries:
+    def __init__(self, locations_csv, sales_csv, group_by, periods_by='month', years=[2019, 2020, 2021]):
+        self.location_data = LocationData(locations_csv)
+        self.sales_data = SalesData(sales_csv)
+        self.group_by = group_by
+        self.period_years = years
+        self.period_duration = periods_by
+        self.location_sales = LocationSales(self.location_data.location_relations, self.sales_data.sales_df)
+        self._set_period_dict() #set self.periods_dict
+        self._set_period_sales() #set self.period_sales
+        self._combine_sales()
+
+    def _set_period_dict(self):
+        periods_dict = {}
+        for year in self.period_years:
+            if self.period_duration == 'month':
+                for month in range(1, 13):
+                    for month in range(1, 13):
+                        _, month_end_day = calendar.monthrange(year, month)
+                        key_name = f'month_{month}_{year}'
+                        periods_dict[key_name] = {'start_date': f'{month}/01/{year}', 'end_date': f'{month}/{month_end_day}/{year}'}
+            self.periods_dict = periods_dict
+
+    def _set_period_sales(self):
+        period_sales = {}
+        dates_dict = self.periods_dict
+        for period, dates in dates_dict.items():
+            date_range = [dates['start_date'], dates['end_date']]
+            #get data and graph of aggregated sales for group_by
+            zone_sales = self.location_sales.get_date_filter_aggregated_sales(
+                date_range, group_by=self.group_by)
+            period_sales[f'{period}'] = zone_sales
+        self.period_sales = period_sales
+
+    def _combine_sales(self):
+        for sales_period, sales_data in self.period_sales.items():
+            sales_data['Period'] = sales_period
+        self.period_sales = pd.concat(self.period_sales.values(), ignore_index=True)
+    
+    def show_lineplot(self):
+        sns.set()
+        plt.figure()
+        plt.xticks(rotation=60)
+        palette = sns.color_palette("rainbow_r", len(self.period_sales['Product'].unique()))
+        plot = sns.lineplot(x='Period', y='Units Sold', hue='Product', style=self.group_by[0], data=self.period_sales, ci=None, palette=palette)
+        plot.set_title(f'Monthly Unit Sales by {self.group_by[1]} and {self.group_by[0]}')
+        plot.set_ylabel('Unit Sales')
+        plot.set_xlabel(f'Time Period')
+        plt.legend(loc=2, fontsize='8', title=f'{self.group_by[1]} and {self.group_by[0]}')
         plt.tight_layout()
         plt.show()
